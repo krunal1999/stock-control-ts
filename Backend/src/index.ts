@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import usersRouter from "./routes/users";
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 app.use("/api/users", usersRouter);
 

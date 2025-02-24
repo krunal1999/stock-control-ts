@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+@plugin "daisyui";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Light Mode Theme */
+@theme {
+  /* 🎨 Primary Colors */
+  --color-primary: #415a77;
+  --color-primary-light: #778da9;
+  --color-primary-dark: #1b263b;
+
+  /* 🎨 Secondary Colors */
+  --color-secondary: #1b263b;
+  --color-secondary-dark: #0d1b2a;
+
+  /* 🎨 Neutral Colors */
+  --color-neutral: #e0e1dd;
+  --color-neutral-dark: #778da9;
+
+  /* 🎨 Background Colors */
+  --color-background-light: #f8f9fa; /* Lighter than neutral for a soft feel */
+  --color-background-dark: #0d1b2a; /* Dark theme background */
+
+  /* 🎨 Surface/Container Colors (for cards, modals, navbar, etc.) */
+  --color-surface-light: #ffffff; /* White for light mode containers */
+  --color-surface-dark: #1b263b; /* Dark blue for dark mode containers */
+
+  /* 🎨 Border Colors */
+  --color-border-light: #ced4da; /* Light gray for light mode borders */
+  --color-border-dark: #415a77; /* Muted blue for dark mode borders */
+
+  /* 🎨 Text Colors */
+  --color-text-light: #1b263b; /* Dark blue for readability in light mode */
+  --color-text-dark: #e0e1dd; /* Light grayish white for dark mode readability */
+
+  /* 🎨 Button Colors */
+  --color-button-primary: #415a77;
+  --color-button-primary-hover: #1b263b;
+  --color-button-text-light: #ffffff;
+  --color-button-text-dark: #e0e1dd;
+}
