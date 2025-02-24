@@ -1,14 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
-import backgroundImage from "./public/Images/backgroud1.jpg";
 
 const Hero: React.FC = () => {
   return (
     <section
       id="home"
       className="hero min-h-screen flex justify-center items-center bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('./public/Images/backgroud1.jpg')" }}
+      style={{ backgroundImage: "url('./Images/backgroud1.jpg')" }}
     >
       <motion.div
         initial={{ opacity: 0, y: -20 }}
