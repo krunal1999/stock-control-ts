@@ -40,7 +40,7 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center space-x-4">
           <RouterLink
             to="/login"
-            className="px-4 py-2 border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all duration-300"
+            className="px-4 py-2 border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all duration-300 dark:text-white"
           >
             Login
           </RouterLink>

@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: cupcake, dark;
+}
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
