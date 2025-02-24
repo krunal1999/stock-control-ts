@@ -37,8 +37,8 @@
   --color-text-dark: #e0e1dd; /* Light grayish white for dark mode readability */
 
   /* 🎨 Button Colors */
-  --color-button-primary: #415a77;
-  --color-button-primary-hover: #1b263b;
-  --color-button-text-light: #ffffff;
-  --color-button-text-dark: #e0e1dd;
+  --color-button-primary: #415a77; /* Slate Blue or Steel Blue */
+  --color-button-primary-hover: #1b263b; /* Dark Slate Gray or Charcoal Gray */
+  --color-button-text-light: #ffffff; /*  White */
+  --color-button-text-dark: #e0e1dd; /*  Light Gray or Off-White*/
 }
