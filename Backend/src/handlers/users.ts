@@ -25,7 +25,7 @@ export const registerUser = async (
     const { error, value } = schema.validate(req.body);
 
     if (error) {
-      return res.status(400).json(new ApiError(error.message, 400));
+      return res.status(400).json({ error: error.details[0].message });
     }
 
     // Check if email already exists
@@ -55,4 +55,51 @@ export const registerUser = async (
     console.error("Registration error:", error); // Log the error
     res.status(500).json(new ApiError("Failed to register user", 500, error));
   }
+};
+
+export const loginUser = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { email, password } = req.body as LoginUserDTO;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json(new ApiError("Invalid email or password", 401));
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res
+        .status(401)
+        .json(new ApiError("Invalid email or password", 401));
+    }
+
+    const accessToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || "secret",
+      {
+        expiresIn: "30m",
+      }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 3600000 / 2, // 30m in milliseconds
+    });
+
+    res.status(200).json(new ApiSuccess({ message: "Login successful" }, 200));
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json(new ApiError("Login failed", 500, error));
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response): Promise<any> => {
+  res.clearCookie("accessToken");
+  res.status(200).json(new ApiSuccess({ message: "Logout successful" }, 200));
 };

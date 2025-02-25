@@ -1,4 +1,5 @@
 import { useState } from "react";
+import authenticationServices from "../../services/AuthenticationServices";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -7,23 +8,81 @@ const LoginPage = () => {
     agree: false,
   });
 
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    agree?: string;
+  }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+
+    setErrors({ ...errors, [name]: "" });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateForm = (): boolean => {
+    let newErrors: { email?: string; password?: string; agree?: string } = {};
+
+    if (!formData.email.includes("@") || !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+    }
+
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (!formData.agree) {
+      newErrors.agree = "You must agree to the terms.";
+    }
+
     console.log(formData);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    try {
+      setIsSubmitting(true);
+      setMessage(null);
+
+      // Send request to backend
+      const response = await authenticationServices.loginUserByEmail(formData);
+
+      console.log(response);
+
+      if (response.status !== 200) {
+        console.log(response.data);
+      }
+
+      if (response.status === 200) {
+        setMessage("Login successful!");
+      } else {
+        setMessage("Invalid login credentials.");
+      }
+    } catch (error) {
+      console.log(error);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
       <div className="w-96 shadow-xl p-6 rounded-lg bg-white dark:bg-gray-800">
         <h2 className="text-center text-lg font-semibold">Login</h2>
+
+        {message && <p className="text-center text-green-600">{message}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-8 mt-4">
           <label className="input input-bordered flex items-center gap-2">
@@ -46,6 +105,10 @@ const LoginPage = () => {
               required
             />
           </label>
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}
+
           <label className="input input-bordered flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -65,6 +128,10 @@ const LoginPage = () => {
               required
             />
           </label>
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+          )}
+
           <hr />
           <div className="flex items-center gap-4">
             <input
@@ -77,11 +144,14 @@ const LoginPage = () => {
             />
             <label htmlFor="agree">I agree to the terms and conditions</label>
           </div>
+          {errors.agree && (
+            <p className="text-red-500 text-xs mt-1">{errors.agree}</p>
+          )}
           <button
             type="submit"
             className="btn btn-primary w-full text-white rounded-2xl"
           >
-            Login
+            {isSubmitting ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

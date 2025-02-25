@@ -5,3 +5,8 @@ export interface RegisterFormData {
   mobile: string;
   gender: string;
 }
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}

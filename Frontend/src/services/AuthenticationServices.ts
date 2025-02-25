@@ -1,5 +1,5 @@
 import axios from "axios";
-import { RegisterFormData } from "types";
+import { LoginFormData, RegisterFormData } from "types";
 
 const apiUrl = import.meta.env.VITE_BACKEND_API_URL as string;
 
@@ -13,7 +13,11 @@ const axiosInstance = axios.create({
 
 class AuthenticationServices {
   registerUserByEmail(data: RegisterFormData) {
-    return axiosInstance.post("/users/registerUser", data);
+    return axiosInstance.post("/users/registeruser", data);
+  }
+
+  loginUserByEmail(data: LoginFormData) {
+    return axiosInstance.post("/users/loginuser", data);
   }
 }
 
