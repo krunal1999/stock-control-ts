@@ -14,7 +14,7 @@ const Navbar: React.FC = () => {
           to="/"
           className="text-3xl font-bold text-primary dark:text-primary-light transition-all"
         >
-          MyBrand
+          <img src="./Images/logo2_rbg.png" alt="Logo" className="h-12" />
         </RouterLink>
 
         {/* Desktop Menu */}

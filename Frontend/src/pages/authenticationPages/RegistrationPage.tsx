@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { HiUser, HiMail, HiLockClosed, HiPhone } from "react-icons/hi";
+import { RegisterFormData } from "types";
+import authenticationServices from "../../services/AuthenticationServices";
 
-const Register = () => {
-  const [formData, setFormData] = useState({
+const Register: React.FC = () => {
+  const [formData, setFormData] = useState<RegisterFormData>({
     fullName: "",
     email: "",
     password: "",
@@ -11,15 +13,71 @@ const Register = () => {
     gender: "",
   });
 
+  const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = (): boolean => {
+    let newErrors: Partial<RegisterFormData> = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full Name is required.";
+    }
+
+    if (!formData.email.includes("@") || !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format.";
+    }
+
+    if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (!/^\d{10}$/.test(formData.mobile)) {
+      newErrors.mobile = "Mobile number must be 10 digits.";
+    }
+
+    if (!formData.gender) {
+      newErrors.gender = "Please select your gender.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    if (!validateForm()) return;
+
+    try {
+      setIsSubmitting(true);
+      setMessage(null);
+
+      const response = await authenticationServices.registerUserByEmail(
+        formData
+      );
+
+      if (response.status === 200) {
+        setMessage("Registration successful!");
+        setFormData({
+          fullName: "",
+          email: "",
+          password: "",
+          mobile: "",
+          gender: "",
+        });
+      }
+    } catch (error) {
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -33,6 +91,8 @@ const Register = () => {
         <h2 className="text-center text-2xl font-bold text-primary dark:text-primary-light">
           Register
         </h2>
+
+        {message && <p className="text-center text-green-600">{message}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-6">
           {/* Full Name Field */}
@@ -48,6 +108,9 @@ const Register = () => {
               required
             />
           </label>
+          {errors.fullName && (
+            <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+          )}
 
           {/* Email Field */}
           <label className="input input-bordered flex items-center gap-3 bg-background-light dark:bg-background-dark">
@@ -62,6 +125,9 @@ const Register = () => {
               required
             />
           </label>
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}
 
           {/* Password Field */}
           <label className="input input-bordered flex items-center gap-3 bg-background-light dark:bg-background-dark">
@@ -76,6 +142,9 @@ const Register = () => {
               required
             />
           </label>
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+          )}
 
           {/* Mobile Field */}
           <label className="input input-bordered flex items-center gap-3 bg-background-light dark:bg-background-dark">
@@ -90,9 +159,11 @@ const Register = () => {
               required
             />
           </label>
+          {errors.mobile && (
+            <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+          )}
 
           {/* Gender Field */}
-
           <select className="select w-full max-w-xs">
             <option disabled selected>
               Select Gender
@@ -101,6 +172,9 @@ const Register = () => {
             <option value="female">Female</option>
             <option value="other">Other</option>
           </select>
+          {errors.gender && (
+            <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+          )}
 
           {/* Submit Button */}
           <motion.button
@@ -114,7 +188,7 @@ const Register = () => {
             rounded-md 
             hover:bg-button-primary-hover transition-all duration-300"
           >
-            Register
+            {isSubmitting ? "Submitting..." : "Register"}
           </motion.button>
         </form>
       </motion.div>
