@@ -25,7 +25,7 @@ export const registerUser = async (
     const { error, value } = schema.validate(req.body);
 
     if (error) {
-      return res.status(400).json({ error: error.details[0].message });
+      return res.status(400).json(new ApiError(error.message, 400));
     }
 
     // Check if email already exists

@@ -47,6 +47,7 @@ const Register: React.FC = () => {
       newErrors.gender = "Please select your gender.";
     }
 
+    // console.log(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,6 +64,11 @@ const Register: React.FC = () => {
         formData
       );
 
+      // console.log(response);
+      if (response.status !== 200) {
+        console.log(response.data);
+      }
+
       if (response.status === 200) {
         setMessage("Registration successful!");
         setFormData({
@@ -74,6 +80,7 @@ const Register: React.FC = () => {
         });
       }
     } catch (error) {
+      console.error(error);
       setMessage("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -164,8 +171,14 @@ const Register: React.FC = () => {
           )}
 
           {/* Gender Field */}
-          <select className="select w-full max-w-xs">
-            <option disabled selected>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
+            className="select w-full max-w-xs"
+          >
+            <option disabled value="">
               Select Gender
             </option>
             <option value="male">Male</option>
