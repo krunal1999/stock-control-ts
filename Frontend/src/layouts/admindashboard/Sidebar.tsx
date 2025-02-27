@@ -1,56 +1,157 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { HiMenu, HiX, HiChevronDown } from "react-icons/hi";
+
+interface SidebarItem {
+  label: string;
+  path?: string;
+  menu?: string;
+  children?: SidebarItem[];
+}
 
 const Sidebar: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [selectedLink, setSelectedLink] = useState<string | null>(null);
+  const navigate = useNavigate();
 
+  const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMenu = (menu: string) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
 
-  return (
-    <div className="w-64 min-h-screen bg-base-200 p-4 shadow-md">
-      <h2 className="text-2xl font-bold text-primary mb-6">Admin Dashboard</h2>
-      <ul className="space-y-2">
+  const handleLinkClick = (path: string, menu?: string) => {
+    navigate(path);
+    setSelectedLink(path);
+    if (menu) {
+      setOpenMenu(null);
+    }
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  };
+
+  const MenuItem: React.FC<{ item: SidebarItem }> = ({ item }) => {
+    if (item.children) {
+      return (
         <li>
           <button
-            onClick={() => toggleMenu("dashboard")}
-            className="w-full text-left p-2 bg-base-100 rounded-lg"
+            onClick={() => {
+              if (openMenu === item.menu) {
+                setOpenMenu(null);
+              } else {
+                setOpenMenu(item.menu || "");
+              }
+            }}
+            className={`w-full flex justify-between items-center p-3 rounded-lg transition ${
+              openMenu === item.menu
+                ? "bg-primary text-white"
+                : "bg-gray-300 dark:bg-background-dark text-text-light dark:text-text-dark hover:bg-primary hover:text-white"
+            }`}
           >
-            Dashboard
+            {item.label}
+            <HiChevronDown
+              className={`transform transition ${
+                openMenu === item.menu ? "rotate-180" : ""
+              }`}
+            />
           </button>
-          {openMenu === "dashboard" && (
-            <ul className="ml-4 mt-2">
-              <li>
-                <Link
-                  to="/dashboard/tab1"
-                  className="block p-2 hover:bg-base-300 rounded"
+          <ul
+            className={`ml-4 mt-2 space-y-2 transition-all ${
+              openMenu === item.menu ? "block" : "hidden"
+            }`}
+          >
+            {item.children.map((child) => (
+              <li key={child.path}>
+                <button
+                  onClick={() => handleLinkClick(child.path || "", item.menu)}
+                  className={`block p-2 rounded-lg transition ${
+                    selectedLink === child.path
+                      ? "bg-primary text-white"
+                      : "hover:bg-primary hover:text-white"
+                  }`}
                 >
-                  Reports
-                </Link>
+                  {child.label}
+                </button>
               </li>
-              <li>
-                <Link
-                  to="/dashboard/tab2"
-                  className="block p-2 hover:bg-base-300 rounded"
-                >
-                  Data
-                </Link>
-              </li>
-            </ul>
-          )}
+            ))}
+          </ul>
         </li>
+      );
+    } else {
+      return (
         <li>
-          <Link to="/users" className="block p-2 hover:bg-base-300 rounded">
-            User Management
-          </Link>
+          <button
+            onClick={() => handleLinkClick(item.path || "")}
+            className={`block p-3 rounded-lg transition ${
+              selectedLink === item.path
+                ? "bg-primary text-white"
+                : "hover:bg-primary hover:text-white"
+            }`}
+          >
+            {item.label}
+          </button>
         </li>
-        <li>
-          <Link to="/inventory" className="block p-2 hover:bg-base-300 rounded">
-            Inventory Management
-          </Link>
-        </li>
-      </ul>
+      );
+    }
+  };
+
+  const sidebarItems: SidebarItem[] = [
+    {
+      label: "Dashboard",
+      menu: "dashboard",
+      children: [
+        { label: "Dashboard", path: "/admin/" },
+        { label: "Reports", path: "/admin/reports" },
+        { label: "Data", path: "/admin/data" },
+      ],
+    },
+    {
+      label: "User Management",
+      menu: "users",
+      children: [{ label: "Users", path: "/admin/users" }],
+    },
+    {
+      label: "Inventory Management",
+      menu: "inventory",
+      children: [
+        { label: "Inventory", path: "/admin/inventory" },
+        { label: "Add Product", path: "/admin/add-product" },
+      ],
+    },
+  ];
+
+  return (
+    <div className="flex">
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed top-4 left-4 z-50 bg-primary p-2 rounded text-white"
+      >
+        {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+      </button>
+
+      <div
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-surface-light dark:bg-surface-dark shadow-lg p-4 transition-transform transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 z-40`}
+      >
+        <h2 className="text-2xl font-bold text-primary dark:text-primary-light mb-6 text-center">
+          Admin Dashboard
+        </h2>
+
+        <ul className="space-y-2">
+          {sidebarItems.map((item) => (
+            <MenuItem key={item.label} item={item} />
+          ))}
+        </ul>
+      </div>
+
+      {isOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 bg-black opacity-50 z-30 md:hidden"
+        ></div>
+      )}
     </div>
   );
 };

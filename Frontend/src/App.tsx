@@ -19,6 +19,13 @@ const AdminDashboardPage = lazy(
   () => import("./pages/admindashboard/AdminDashboardPage")
 );
 
+const InventoryDashboard = lazy(
+  () => import("./pages/admindashboard/InventoryDashboard")
+);
+const AddInventoryForm = lazy(
+  () => import("./pages/admindashboard/AddInventoryForm")
+);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -65,6 +72,22 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <AdminDashboardPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="inventory"
+          element={
+            <Suspense fallback={<Loader />}>
+              <InventoryDashboard />
+            </Suspense>
+          }
+        />
+        <Route
+          path="add-product"
+          element={
+            <Suspense fallback={<Loader />}>
+              <AddInventoryForm />
             </Suspense>
           }
         />
