@@ -1,11 +1,30 @@
 import React, { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
-import { Link as ScrollLink } from "react-scroll"; // Import react-scroll
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { Link as ScrollLink, animateScroll as scroll } from "react-scroll"; // Import react-scroll
 import { HiMenu, HiX } from "react-icons/hi";
 import ThemeToggle from "./ThemeToggle";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleNavigation = (section: string) => {
+    if (location.pathname === "/") {
+      scroll.scrollTo(document.getElementById(section)?.offsetTop || 0, {
+        duration: 500,
+        smooth: true,
+      });
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        scroll.scrollTo(document.getElementById(section)?.offsetTop || 0, {
+          duration: 500,
+          smooth: true,
+        });
+      }, 500);
+    }
+  };
 
   return (
     <nav className="bg-background-light dark:bg-background-dark shadow-md sticky top-0 z-50 transition-all">
@@ -22,15 +41,21 @@ const Navbar: React.FC = () => {
           {["Home", "About", "Facilities", "Testimonials", "Contact"].map(
             (item) => (
               <li key={item}>
-                <ScrollLink
-                  to={item.toLowerCase()} // Matches the section ID
+                {/* <ScrollLink
+                  to={`${item.toLowerCase()}`} // Matches the section ID
                   smooth={true}
                   duration={500}
                   offset={-70} // Adjusts for fixed navbar
                   className="cursor-pointer text-text-light dark:text-text-dark hover:text-primary transition duration-300"
                 >
                   {item}
-                </ScrollLink>
+                </ScrollLink> */}
+                <button
+                  onClick={() => handleNavigation(item.toLowerCase())}
+                  className="cursor-pointer text-text-light dark:text-text-dark hover:text-primary transition duration-300"
+                >
+                  {item}
+                </button>
               </li>
             )
           )}
