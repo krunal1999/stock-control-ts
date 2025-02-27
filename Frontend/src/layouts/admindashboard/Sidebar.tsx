@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
                   to="/dashboard/tab1"
                   className="block p-2 hover:bg-base-300 rounded"
                 >
-                  Tab 1
+                  Reports
                 </Link>
               </li>
               <li>
@@ -34,20 +34,20 @@ const Sidebar: React.FC = () => {
                   to="/dashboard/tab2"
                   className="block p-2 hover:bg-base-300 rounded"
                 >
-                  Tab 2
+                  Data
                 </Link>
               </li>
             </ul>
           )}
         </li>
         <li>
-          <Link to="/reports" className="block p-2 hover:bg-base-300 rounded">
-            Reports
+          <Link to="/users" className="block p-2 hover:bg-base-300 rounded">
+            User Management
           </Link>
         </li>
         <li>
-          <Link to="/download" className="block p-2 hover:bg-base-300 rounded">
-            Download Data
+          <Link to="/inventory" className="block p-2 hover:bg-base-300 rounded">
+            Inventory Management
           </Link>
         </li>
       </ul>
