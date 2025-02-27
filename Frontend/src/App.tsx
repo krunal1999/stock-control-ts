@@ -26,6 +26,10 @@ const AddInventoryForm = lazy(
   () => import("./pages/admindashboard/AddInventoryForm")
 );
 
+const ProductUpdate = lazy(
+  () => import("./pages/admindashboard/ProductUpdate")
+);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -88,6 +92,15 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <AddInventoryForm />
+            </Suspense>
+          }
+        />
+
+        <Route
+          path="update-product"
+          element={
+            <Suspense fallback={<Loader />}>
+              <ProductUpdate />
             </Suspense>
           }
         />
