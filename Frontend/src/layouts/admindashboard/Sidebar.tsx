@@ -109,7 +109,11 @@ const Sidebar: React.FC = () => {
     {
       label: "Purchase Management",
       menu: "purchase",
-      children: [{ label: "Vendor Management", path: "/admin/vendor" }],
+      children: [
+        { label: "Vendor Management", path: "/admin/vendor" },
+        { label: "Purchase Management", path: "/admin/purchase" },
+        { label: "Received order", path: "/admin/receivedorder" },
+      ],
     },
     {
       label: "Inventory Management",
