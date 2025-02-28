@@ -107,9 +107,9 @@ const Sidebar: React.FC = () => {
       ],
     },
     {
-      label: "User Management",
-      menu: "users",
-      children: [{ label: "Users", path: "/admin/users" }],
+      label: "Purchase Management",
+      menu: "purchase",
+      children: [{ label: "Vendor Management", path: "/admin/vendor" }],
     },
     {
       label: "Inventory Management",

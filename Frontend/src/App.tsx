@@ -31,6 +31,10 @@ const WarehouseComponent = lazy(
   () => import("./pages/admindashboard/Warehouse")
 );
 
+const VendorManagement = lazy(
+  () => import("./pages/admindashboard/VendorManagement")
+);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -114,6 +118,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <WarehouseComponent />
+            </Suspense>
+          }
+        />
+        <Route
+          path="vendor"
+          element={
+            <Suspense fallback={<Loader />}>
+              <VendorManagement />
             </Suspense>
           }
         />
