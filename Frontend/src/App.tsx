@@ -9,7 +9,6 @@ import Layout from "./layouts/Layout";
 import LandingPage from "./pages/LandingPage";
 import Loader from "./component/Loader";
 
-// Lazy load the components
 const LoginPage = lazy(() => import("./pages/authenticationPages/LoginPage"));
 const RegistrationPage = lazy(
   () => import("./pages/authenticationPages/RegistrationPage")
@@ -18,22 +17,23 @@ const AdminLayout = lazy(() => import("./layouts/admindashboard/AdminLayout"));
 const AdminDashboardPage = lazy(
   () => import("./pages/admindashboard/AdminDashboardPage")
 );
-
 const InventoryDashboard = lazy(
   () => import("./pages/admindashboard/InventoryDashboard")
 );
 const AddInventoryForm = lazy(
   () => import("./pages/admindashboard/AddInventoryForm")
 );
-
 const ProductUpdate = lazy(
   () => import("./pages/admindashboard/ProductUpdate")
+);
+const CategoryPage = lazy(() => import("./pages/admindashboard/CategoryPage"));
+const WarehouseComponent = lazy(
+  () => import("./pages/admindashboard/Warehouse")
 );
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      {/* Public Routes */}
       <Route path="/" element={<Layout />}>
         <Route index element={<LandingPage />} />
         <Route
@@ -53,8 +53,6 @@ const router = createBrowserRouter(
           }
         />
       </Route>
-
-      {/* Admin Routes */}
       <Route
         path="/admin"
         element={
@@ -95,7 +93,6 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
-
         <Route
           path="update-product"
           element={
@@ -104,13 +101,27 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
+        <Route
+          path="category"
+          element={
+            <Suspense fallback={<Loader />}>
+              <CategoryPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="warehouse"
+          element={
+            <Suspense fallback={<Loader />}>
+              <WarehouseComponent />
+            </Suspense>
+          }
+        />
       </Route>
     </>
   )
 );
 
-function App() {
-  return <RouterProvider router={router} />;
-}
+const App = () => <RouterProvider router={router} />;
 
 export default App;
