@@ -126,6 +126,22 @@ const Sidebar: React.FC = () => {
         { label: "Warehouse", path: "/admin/warehouse" },
       ],
     },
+    {
+      label: "Order Management",
+      menu: "order",
+      children: [
+        { label: "Orders Dashboard", path: "/admin/orders" },
+        { label: "Received Orders", path: "/admin/userorders" },
+      ],
+    },
+    {
+      label: "Billing",
+      menu: "billing",
+      children: [
+        { label: "Billing Dashboard", path: "/admin/billing" },
+        { label: "Pay Bills", path: "/admin/paybills" },
+      ],
+    },
   ];
 
   return (

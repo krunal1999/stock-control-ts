@@ -42,6 +42,10 @@ const ReceivedOrders = lazy(
   () => import("./pages/admindashboard/ReceivedOrders")
 );
 
+const OrderDashboard = lazy(
+  () => import("./pages/admindashboard/OrderDashboard")
+);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -149,6 +153,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <ReceivedOrders />
+            </Suspense>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <Suspense fallback={<Loader />}>
+              <OrderDashboard />
             </Suspense>
           }
         />
