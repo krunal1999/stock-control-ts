@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDB } from "./config/db";
 import cookieParser from "cookie-parser";
 import usersRouter from "./routes/users";
+import adminRouter from "./routes/admin";
 
 dotenv.config();
 
@@ -40,6 +41,8 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.use("/api/v1/users", usersRouter);
+
+app.use("/api/v1/admin", adminRouter);
 
 // make Global Error Handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

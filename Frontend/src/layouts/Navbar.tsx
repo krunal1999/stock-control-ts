@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
-import { Link as ScrollLink, animateScroll as scroll } from "react-scroll"; // Import react-scroll
+import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
+// Import react-scroll
 import { HiMenu, HiX } from "react-icons/hi";
 import ThemeToggle from "./ThemeToggle";
 

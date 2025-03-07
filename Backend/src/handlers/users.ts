@@ -103,3 +103,4 @@ export const logoutUser = async (req: Request, res: Response): Promise<any> => {
   res.clearCookie("accessToken");
   res.status(200).json(new ApiSuccess({ message: "Logout successful" }, 200));
 };
+

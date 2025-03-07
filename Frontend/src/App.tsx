@@ -8,7 +8,6 @@ import {
 import Layout from "./layouts/Layout";
 import LandingPage from "./pages/LandingPage";
 import Loader from "./component/Loader";
-
 const LoginPage = lazy(() => import("./pages/authenticationPages/LoginPage"));
 const RegistrationPage = lazy(
   () => import("./pages/authenticationPages/RegistrationPage")
@@ -30,22 +29,24 @@ const CategoryPage = lazy(() => import("./pages/admindashboard/CategoryPage"));
 const WarehouseComponent = lazy(
   () => import("./pages/admindashboard/Warehouse")
 );
-
 const VendorManagement = lazy(
   () => import("./pages/admindashboard/VendorManagement")
 );
 const PurchaseManagement = lazy(
   () => import("./pages/admindashboard/PurchaseManagement")
 );
-
 const ReceivedOrders = lazy(
   () => import("./pages/admindashboard/ReceivedOrders")
 );
-
 const OrderDashboard = lazy(
   () => import("./pages/admindashboard/OrderDashboard")
 );
-
+const DashboardReport = lazy(
+  () => import("./pages/admindashboard/DashboardReport")
+);
+const DashboardData = lazy(
+  () => import("./pages/admindashboard/DashboardData")
+);
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -68,6 +69,7 @@ const router = createBrowserRouter(
           }
         />
       </Route>
+
       <Route
         path="/admin"
         element={
@@ -164,11 +166,25 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
+        <Route
+          path="reports"
+          element={
+            <Suspense fallback={<Loader />}>
+              <DashboardReport />
+            </Suspense>
+          }
+        />
+        <Route
+          path="data"
+          element={
+            <Suspense fallback={<Loader />}>
+              <DashboardData />
+            </Suspense>
+          }
+        />
       </Route>
     </>
   )
 );
-
 const App = () => <RouterProvider router={router} />;
-
 export default App;

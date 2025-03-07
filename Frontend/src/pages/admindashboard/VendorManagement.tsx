@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HiTrash, HiPencilAlt, HiPlusCircle, HiX } from "react-icons/hi";
+import vendorservice from "../../services/VendorServices";
 
 interface Vendor {
-  id: number;
+  _id?: string;
   fullName: string;
   email: string;
   contactNumber: string;
@@ -16,13 +17,35 @@ interface Vendor {
 const VendorManagement: React.FC = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentVendor, setCurrentVendor] = useState<Vendor | null>(null);
+  const [currentVendor, setCurrentVendor] = useState<Vendor>({
+    fullName: "",
+    email: "",
+    contactNumber: "",
+    companyName: "",
+    companyAddress: "",
+    companyMobileNumber: "",
+    brandName: "",
+    countryOfOrigin: "",
+  });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      setLoading(true);
+      const response = await vendorservice.getAllVendor();
+      // console.log(response.data.data);
+      setVendors(response.data.data);
+      setLoading(false);
+    };
+    fetchVendors();
+  }, [loading]);
 
   const handleOpenModal = (vendor?: Vendor) => {
-    setCurrentVendor(
-      vendor || {
-        id: 0,
+    if (vendor) {
+      setCurrentVendor(vendor);
+    } else {
+      setCurrentVendor({
         fullName: "",
         email: "",
         contactNumber: "",
@@ -31,60 +54,100 @@ const VendorManagement: React.FC = () => {
         companyMobileNumber: "",
         brandName: "",
         countryOfOrigin: "",
-      }
-    );
+      });
+    }
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setCurrentVendor(null);
+    setCurrentVendor({
+      fullName: "",
+      email: "",
+      contactNumber: "",
+      companyName: "",
+      companyAddress: "",
+      companyMobileNumber: "",
+      brandName: "",
+      countryOfOrigin: "",
+    });
     setIsModalOpen(false);
   };
 
-  const handleSaveVendor = () => {
+  const handleSaveVendor = async () => {
     if (!currentVendor) return;
-    if (!currentVendor.fullName.trim() || !currentVendor.email.trim()) {
-      setError("⚠️ Full Name and Email are required.");
-      return;
-    }
     if (
-      vendors.some(
-        (v) =>
-          v.email.toLowerCase() === currentVendor.email.toLowerCase() &&
-          v.id !== currentVendor.id
-      )
+      !currentVendor.fullName.trim() ||
+      !currentVendor.email.trim() ||
+      !currentVendor.brandName ||
+      !currentVendor.countryOfOrigin ||
+      !currentVendor.companyName ||
+      !currentVendor.companyAddress ||
+      !currentVendor.companyMobileNumber ||
+      !currentVendor.contactNumber
     ) {
-      setError("⚠️ Vendor with this email already exists.");
+      setError("⚠️ All fields are required.");
       return;
     }
+    console.log(currentVendor);
 
-    if (currentVendor.id && vendors.some((v) => v.id === currentVendor.id)) {
-      setVendors(
-        vendors.map((v) => (v.id === currentVendor.id ? currentVendor : v))
-      );
-    } else {
-      setVendors([...vendors, { ...currentVendor, id: Date.now() }]);
+    try {
+      setError("");
+      setLoading(true);
+      const response = await vendorservice.createVendor(currentVendor);
+      console.log(response);
+      handleCloseModal();
+      setLoading(false);
+      setError("");
+    } catch (error) {
+      console.log(error);
     }
-
-    setError("");
-    handleCloseModal();
   };
 
-  const handleDeleteVendor = (id: number) => {
-    setVendors(vendors.filter((v) => v.id !== id));
+  const handleDeleteVendor = async (id: string) => {
+    console.log(id);
+    try {
+      setLoading(true);
+      const response = await vendorservice.deleteVendor(id);
+      if (response.status === 200) {
+        console.log(response);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateVendor = async () => {
+    console.log(currentVendor);
+    try {
+      setLoading(true);
+      const response = await vendorservice.updateVendor(
+        currentVendor._id || "",
+        currentVendor
+      );
+      if (response.status === 200) {
+        // console.log(response);
+        handleCloseModal();
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-6xl mx-auto bg-white shadow-lg p-6 rounded-xl border">
-      <h2 className="text-2xl font-bold text-primary text-center">
+    <div className=" max-w-7xl mx-auto bg-white shadow-lg p-6 rounded-xl  dark:bg-gray-800">
+      <h2 className="text-3xl font-bold text-primary text-center">
         🏢 Vendor Management
       </h2>
       <div className="flex justify-end">
         <button
-          className="btn btn-outline flex items-center gap-2"
+          className="btn btn-outline btn-xl flex items-center gap-2"
           onClick={() => handleOpenModal()}
         >
-          <HiPlusCircle className="text-lg" /> Add Vendor
+          <HiPlusCircle className="text-xl" /> Add Vendor
         </button>
       </div>
       <div className="overflow-x-auto mt-6">
@@ -103,7 +166,7 @@ const VendorManagement: React.FC = () => {
             {vendors.length > 0 ? (
               vendors.map((vendor) => (
                 <tr
-                  key={vendor.id}
+                  key={vendor._id}
                   className="border-b hover:bg-gray-100 transition-all"
                 >
                   <td className="p-3 font-semibold">{vendor.fullName}</td>
@@ -113,14 +176,14 @@ const VendorManagement: React.FC = () => {
                   <td className="p-3">{vendor.countryOfOrigin}</td>
                   <td className="p-3 flex justify-center gap-3">
                     <button
-                      className="btn btn-outline bg-amber-400 btn-md flex items-center gap-1"
+                      className="btn btn-outline bg-amber-400 btn-md flex items-center gap-1 dark:text-black"
                       onClick={() => handleOpenModal(vendor)}
                     >
                       <HiPencilAlt className="text-lg" /> Edit
                     </button>
                     <button
-                      className="btn btn-outline bg-red-500 btn-md flex items-center gap-1"
-                      onClick={() => handleDeleteVendor(vendor.id)}
+                      className="btn btn-outline bg-red-500 btn-md flex items-center gap-1 dark:text-black"
+                      onClick={() => handleDeleteVendor(vendor._id || "")}
                     >
                       <HiTrash className="text-lg" /> Delete
                     </button>
@@ -137,12 +200,13 @@ const VendorManagement: React.FC = () => {
           </tbody>
         </table>
       </div>
+
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-full max-w-lg border shadow-xl">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center dark:bg-gray-800">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl border shadow-xl dark:bg-gray-800">
             <div className="flex justify-between items-center">
               <h2 className="text-lg font-semibold">
-                {currentVendor?.id ? "Update Vendor" : "Add Vendor"}
+                {currentVendor._id ? "Update Vendor" : "Add Vendor"}
               </h2>
               <button
                 className="text-gray-500 hover:text-red-500 transition"
@@ -151,40 +215,63 @@ const VendorManagement: React.FC = () => {
                 <HiX size={24} />
               </button>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {[
-                "fullName",
-                "email",
-                "contactNumber",
-                "companyName",
-                "companyAddress",
-                "companyMobileNumber",
-                "brandName",
-                "countryOfOrigin",
-              ].map((field, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  placeholder={field.replace(/([A-Z])/g, " $1").trim()}
-                  className="input rounded-lg w-full border bg-gray-100"
-                  value={(currentVendor as any)?.[field] || ""}
-                  onChange={(e) =>
-                    setCurrentVendor({
-                      ...currentVendor!,
-                      [field]: e.target.value,
-                    })
-                  }
-                />
-              ))}
+                "fullName-text",
+                "email-email",
+                "contactNumber-number",
+                "companyName-text",
+                "companyAddress-text",
+                "companyMobileNumber-number",
+                "brandName-text",
+                "countryOfOrigin-text",
+              ].map((field, index) => {
+                const [fieldName, fieldType] = field.split("-"); // Split the string
+                const placeholderText = fieldName
+                  .replace(/([A-Z])/g, " $1")
+                  .trim(); // Create placeholder
+
+                return (
+                  <input
+                    key={index}
+                    type={fieldType} // Set the type
+                    required
+                    placeholder={placeholderText} // Set the placeholder
+                    className="input text-xl rounded-lg w-full border bg-gray-100 dark:bg-gray-800"
+                    value={
+                      (currentVendor as Vendor)?.[fieldName as keyof Vendor] ||
+                      ""
+                    }
+                    onChange={(e) =>
+                      setCurrentVendor({
+                        ...currentVendor!,
+                        [fieldName as keyof Vendor]: e.target.value,
+                      })
+                    }
+                  />
+                );
+              })}
             </div>
+
             {error && <p className="text-red-500 text-md mt-2">{error}</p>}
             <div className="mt-4 flex justify-end">
-              <button
-                className="btn btn-outline bg-green-500 text-white"
-                onClick={handleSaveVendor}
-              >
-                {currentVendor?.id ? "Update" : "Add"}
-              </button>
+              {currentVendor._id ? (
+                <button
+                  className="btn btn-outline bg-green-500 text-white"
+                  onClick={handleUpdateVendor}
+                >
+                  Update
+                </button>
+              ) : (
+                <button
+                  className="btn btn-outline bg-green-500 text-white"
+                  onClick={handleSaveVendor}
+                >
+                  Add
+                </button>
+              )}
+
               <button
                 className="btn btn-outline bg-red-600 text-white ml-2"
                 onClick={handleCloseModal}
