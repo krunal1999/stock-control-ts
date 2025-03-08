@@ -21,3 +21,12 @@ export interface Vendor {
   brandName?: string;
   countryOfOrigin: string;
 }
+
+export interface purchaseData {
+  vendor: string;
+  product: string;
+  quantity: string;
+  category: string;
+  vendorId: string;
+  productId: string | null;
+}

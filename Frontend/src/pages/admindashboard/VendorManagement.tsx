@@ -167,7 +167,7 @@ const VendorManagement: React.FC = () => {
               vendors.map((vendor) => (
                 <tr
                   key={vendor._id}
-                  className="border-b hover:bg-gray-100 transition-all"
+                  className="border-b hover:bg-gray-100 dark:hover:bg-gray-500 transition-all"
                 >
                   <td className="p-3 font-semibold">{vendor.fullName}</td>
                   <td className="p-3">{vendor.email}</td>

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { HiPlusCircle, HiX } from "react-icons/hi";
-
+import vendorservice from "../../services/VendorServices";
+import purchaseservice from "../../services/PurchaseService";
+// Interfaces
 interface Vendor {
-  id: number;
-  name: string;
+  _id: string;
+  fullName: string;
 }
 
 interface Product {
-  id: number;
+  _id: string;
   name: string;
 }
 
@@ -16,54 +18,114 @@ interface Category {
   name: string;
 }
 
+interface PurchaseState {
+  selectedVendor: string;
+  selectedProduct: string;
+  totalQuantity: string;
+  selectedCategory: string;
+  error: string;
+}
+
+// Reducer Function for Managing State Efficiently
+const purchaseReducer = (state: PurchaseState, action: any): PurchaseState => {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "SET_ERROR":
+      return { ...state, error: action.error };
+    case "RESET":
+      return {
+        selectedVendor: "",
+        selectedProduct: "",
+        totalQuantity: "",
+        selectedCategory: "",
+        error: "",
+      };
+    default:
+      return state;
+  }
+};
+
 const PurchaseManagement: React.FC = () => {
-  const [vendors] = useState<Vendor[]>([
-    { id: 1, name: "Vendor A" },
-    { id: 2, name: "Vendor B" },
-  ]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  const [products, setProducts] = useState<Product[]>([
-    { id: 1, name: "Product A" },
-    { id: 2, name: "Product B" },
-  ]);
+  const [state, dispatch] = useReducer(purchaseReducer, {
+    selectedVendor: "",
+    selectedProduct: "",
+    totalQuantity: "",
+    selectedCategory: "",
+    error: "",
+  });
 
-  const [categories] = useState<Category[]>([
-    { id: 1, name: "Category A" },
-    { id: 2, name: "Category B" },
-  ]);
+  // Fetch Data (Vendors, Products, Categories)
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const response = await vendorservice.getAllVendor();
+        const vendorList = response.data.data.map((vendor: Vendor) => ({
+          _id: vendor._id,
+          fullName: vendor.fullName,
+        }));
+        setVendors(vendorList);
+      } catch (error) {
+        console.error("Error fetching vendors:", error);
+      }
+    };
 
-  const [selectedVendor, setSelectedVendor] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState("");
-  const [newProductName, setNewProductName] = useState("");
-  const [totalQuantity, setTotalQuantity] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [error, setError] = useState("");
+    fetchVendors();
 
-  const handleSave = () => {
+    setProducts([
+      { _id: "1", name: "Product A" },
+      { _id: "2", name: "Product B" },
+    ]);
+
+    setCategories([
+      { id: 1, name: "Category A" },
+      { id: 2, name: "Category B" },
+      { id: 3, name: "Category C" },
+    ]);
+  }, []);
+
+  // Handle Save
+  const handleSave = async () => {
     if (
-      !selectedVendor ||
-      (!selectedProduct && !newProductName) ||
-      !totalQuantity ||
-      !selectedCategory
+      !state.selectedVendor ||
+      !state.selectedProduct ||
+      !state.totalQuantity ||
+      !state.selectedCategory
     ) {
-      setError("⚠️ Please fill all fields.");
+      dispatch({ type: "SET_ERROR", error: "⚠️ Please fill all fields." });
       return;
     }
 
-    if (newProductName) {
-      const newProduct: Product = { id: Date.now(), name: newProductName };
-      setProducts([...products, newProduct]);
-      setSelectedProduct(newProduct.name);
+    dispatch({ type: "SET_ERROR", error: "" });
+
+    const vendor = vendors.find((v) => v.fullName === state.selectedVendor);
+    const product = products.find((p) => p.name === state.selectedProduct);
+
+    const purchaseData = {
+      vendor: state.selectedVendor,
+      product: state.selectedProduct,
+      quantity: state.totalQuantity,
+      category: state.selectedCategory,
+      vendorId: vendor?._id || "",
+      productId: product?._id ? product?._id : null,
+    };
+
+    try {
+      const response = await purchaseservice.createPurchaaseOrder(purchaseData);
+      console.log(response);
+      if (response.status === 200) {
+        dispatch({ type: "RESET" });
+        alert("Purchase Order Created Successfully");
+      }
+    } catch (error) {
+      console.error("Error creating purchase order:", error);
+      alert("Error creating purchase order");
     }
-
-    alert("✅ Purchase saved successfully!");
-
-    setSelectedVendor("");
-    setSelectedProduct("");
-    setNewProductName("");
-    setTotalQuantity("");
-    setSelectedCategory("");
-    setError("");
   };
 
   return (
@@ -73,50 +135,101 @@ const PurchaseManagement: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-1 gap-4 mt-6">
+        {/* Vendor Selection */}
         <div>
           <label className="block text-md font-medium text-text-light dark:text-text-dark">
             Select Vendor
           </label>
           <select
             className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={selectedVendor}
-            onChange={(e) => setSelectedVendor(e.target.value)}
+            value={state.selectedVendor}
+            onChange={(e) =>
+              dispatch({
+                type: "SET_FIELD",
+                field: "selectedVendor",
+                value: e.target.value,
+              })
+            }
           >
             <option value="">Choose a Vendor</option>
             {vendors.map((vendor) => (
-              <option key={vendor.id} value={vendor.name}>
-                {vendor.name}
+              <option key={vendor._id} value={vendor.fullName}>
+                {vendor.fullName}
               </option>
             ))}
           </select>
         </div>
 
-        <div>
+        {/* Product Selection */}
+        <div className="relative">
           <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Select Product
+            Select From Existing Products
           </label>
-          <select
-            className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(e.target.value)}
-          >
-            <option value="">Choose a Product</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.name}>
-                {product.name}
-              </option>
-            ))}
-          </select>
-
           <input
             type="text"
-            placeholder="Or Add New Product"
-            className="input rounded-lg w-full mt-2 border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={newProductName}
-            onChange={(e) => setNewProductName(e.target.value)}
+            className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
+            value={state.selectedProduct}
+            onChange={(e) =>
+              dispatch({
+                type: "SET_FIELD",
+                field: "selectedProduct",
+                value: e.target.value,
+              })
+            }
+            onFocus={() => setShowDropdown(true)}
+            placeholder="Choose or Enter a Product"
           />
+
+          {showDropdown && (
+            <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-20 rounded-lg max-h-40 overflow-y-auto dark:bg-gray-800 dark:text-white ">
+              {products.map((product) => (
+                <li
+                  key={product._id}
+                  className="p-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
+                  onClick={() => {
+                    dispatch({
+                      type: "SET_FIELD",
+                      field: "selectedProduct",
+                      value: product.name,
+                    });
+                    setShowDropdown(false);
+                  }}
+                >
+                  {product.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
+        <div className="relative">
+          <label className="block text-md font-medium text-text-light dark:text-text-dark">
+            Add New Product
+          </label>
+          <input
+            list="productList"
+            className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark relative z-10"
+            value={state.selectedProduct}
+            onChange={(e) =>
+              dispatch({
+                type: "SET_FIELD",
+                field: "selectedProduct",
+                value: e.target.value,
+              })
+            }
+            placeholder="Choose or Enter a Product"
+          />
+          <datalist
+            id="productList"
+            className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-20"
+          >
+            {products.map((product) => (
+              <option key={product._id} value={product.name} />
+            ))}
+          </datalist>
+        </div>
+
+        {/* Quantity Input */}
         <div>
           <label className="block text-md font-medium text-text-light dark:text-text-dark">
             Total Quantity
@@ -125,19 +238,32 @@ const PurchaseManagement: React.FC = () => {
             type="number"
             placeholder="Enter Quantity"
             className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={totalQuantity}
-            onChange={(e) => setTotalQuantity(e.target.value)}
+            value={state.totalQuantity}
+            onChange={(e) =>
+              dispatch({
+                type: "SET_FIELD",
+                field: "totalQuantity",
+                value: e.target.value,
+              })
+            }
           />
         </div>
 
+        {/* Category Selection */}
         <div>
           <label className="block text-md font-medium text-text-light dark:text-text-dark">
             Select Category
           </label>
           <select
             className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={state.selectedCategory}
+            onChange={(e) =>
+              dispatch({
+                type: "SET_FIELD",
+                field: "selectedCategory",
+                value: e.target.value,
+              })
+            }
           >
             <option value="">Choose a Category</option>
             {categories.map((category) => (
@@ -149,8 +275,12 @@ const PurchaseManagement: React.FC = () => {
         </div>
       </div>
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {/* Error Message */}
+      {state.error && (
+        <p className="text-red-500 text-sm mt-2">{state.error}</p>
+      )}
 
+      {/* Buttons */}
       <div className="flex justify-end gap-4 mt-6">
         <button
           className="btn btn-outline btn-lg bg-green-400 text-white flex items-center gap-2"
@@ -160,7 +290,7 @@ const PurchaseManagement: React.FC = () => {
         </button>
         <button
           className="btn btn-outline btn-lg bg-red-600 text-white flex items-center gap-2"
-          onClick={() => window.location.reload()}
+          onClick={() => dispatch({ type: "RESET" })}
         >
           <HiX className="text-lg" /> Cancel
         </button>
