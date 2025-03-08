@@ -60,3 +60,39 @@ export const getAllPurchase = async (
       .json(new ApiError("Failed to get all purchases", 500, error));
   }
 };
+
+export const updatePurchaseOrder = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const purchase = await Purchase.findByIdAndUpdate(
+      id,
+      {
+        status: "Received",
+        orderComplete: true,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!purchase) {
+      return res
+        .status(404)
+        .json(new ApiError("Purchase order not found", 404));
+    }
+
+    res
+      .status(200)
+      .json(new ApiSuccess({ message: "Purchase order updated" }, 200));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json(new ApiError("Failed to update purchase order", 500, error));
+  }
+};

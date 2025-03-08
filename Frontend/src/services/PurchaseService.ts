@@ -18,6 +18,9 @@ class PurchaseService {
   createPurchaaseOrder(data: purchaseData) {
     return axiosInstance.post("/admin/purchase", data);
   }
+  updatePurchaseOrder(id: string) {
+    return axiosInstance.put(`/admin/purchase/${id}`);
+  }
 }
 
 const purchaseservice = new PurchaseService();

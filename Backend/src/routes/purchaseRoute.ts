@@ -6,7 +6,11 @@ import {
   deleteVendorById,
   updateExistingVendorbyId,
 } from "../handlers/vendorHandler";
-import { createNewPurchase, getAllPurchase } from "../handlers/purchaseHandler";
+import {
+  createNewPurchase,
+  getAllPurchase,
+  updatePurchaseOrder,
+} from "../handlers/purchaseHandler";
 
 const router = Router();
 
@@ -18,5 +22,6 @@ router.put("/vendor/:id", updateExistingVendorbyId);
 
 router.post("/", createNewPurchase);
 router.get("/", getAllPurchase);
+router.put("/:id", updatePurchaseOrder);
 
 export default router;
