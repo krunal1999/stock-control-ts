@@ -30,3 +30,27 @@ export interface purchaseData {
   vendorId: string;
   productId: string | null;
 }
+
+export interface ProductFormData {
+  productName: string;
+  costPrice: string;
+  sellPrice: string;
+  discountPrice: string;
+  stock: string;
+  location: string;
+  locationType: string;
+  volume: string;
+  weight: string;
+  length: string;
+  breadth: string;
+  height: string;
+  countryOfOrigin: string;
+  category: string;
+  images: File[];
+  minQuantityAlert: string;
+  lowStockAlert: string;
+  vendorDetails: string;
+  quantity: string;
+  productDescription: string;
+  vendorId: string;
+}

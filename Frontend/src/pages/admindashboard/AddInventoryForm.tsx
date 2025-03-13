@@ -1,6 +1,10 @@
 import { FormInput } from "../../component/adminDashboard/FormInput";
-import { useState } from "react";
-import { HiOutlinePhotograph, HiOutlineCloudUpload } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import { HiOutlinePhotograph } from "react-icons/hi";
+import warehouseService from "../../services/WarehouseService";
+import categoryService from "../../services/CategoryServices";
+import vendorService from "../../services/VendorServices";
+import inventoryService from "../../services/InventoryService";
 
 interface ProductFormData {
   productName: string;
@@ -9,7 +13,8 @@ interface ProductFormData {
   discountPrice: string;
   stock: string;
   location: string;
-  size: string;
+  locationType: string;
+  volume: string;
   weight: string;
   length: string;
   breadth: string;
@@ -21,7 +26,37 @@ interface ProductFormData {
   lowStockAlert: string;
   vendorDetails: string;
   quantity: string;
-  additionalDetails: string;
+  productDescription: string;
+  vendorId: string;
+}
+
+interface Cells {
+  _id: string;
+  location: string;
+}
+
+interface WarehouseCell {
+  cellVolume: number;
+  cells: Cells[];
+  cols: number;
+  rows: number;
+  warehouseName: string;
+  _id: string;
+}
+
+interface WarehouseType {
+  _id: string;
+  warehouseName: string;
+}
+
+interface Category {
+  _id: string;
+  categoryName: string;
+}
+
+interface Vendor {
+  _id: string;
+  fullName: string;
 }
 
 const AddInventoryForm: React.FC = () => {
@@ -32,7 +67,8 @@ const AddInventoryForm: React.FC = () => {
     discountPrice: "",
     stock: "",
     location: "",
-    size: "",
+    locationType: "",
+    volume: "",
     weight: "",
     length: "",
     breadth: "",
@@ -44,15 +80,87 @@ const AddInventoryForm: React.FC = () => {
     lowStockAlert: "",
     vendorDetails: "",
     quantity: "",
-    additionalDetails: "",
+    productDescription: "",
+    vendorId: "",
   });
+
+  const [warehouseTypes, setWarehouseTypes] = useState<WarehouseType[]>([]);
+  const [warehouseCells, setWarehouseCells] = useState<WarehouseCell[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [location, setLocation] = useState<Cells[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAvailableCells = async () => {
+      const response = await warehouseService.getAvailableCellbyLocation();
+      setWarehouseCells(response.data.data);
+      // console.log(response.data.data);
+
+      const warehouseTypes = await warehouseService.getWarehouseTypes();
+      setWarehouseTypes(warehouseTypes.data.data);
+      // console.log(warehouseTypes.data.data);
+
+      const categories = await categoryService.getAllCategories();
+      setCategories(categories.data.data);
+      // console.log(categories.data.data);
+
+      const vendors = await vendorService.getAllVendor();
+      const vendorData = vendors.data.data;
+      const newVendorData = vendorData.map((vendor: Vendor) => ({
+        _id: vendor._id,
+        fullName: vendor.fullName,
+      }));
+      // console.log(newVendorData);
+
+      setVendors(newVendorData);
+    };
+    fetchAvailableCells();
+  }, [loading]);
+
+  useEffect(() => {
+    const length = parseFloat(formData.length) || 1;
+    const breadth = parseFloat(formData.breadth) || 1;
+    const height = parseFloat(formData.height) || 1;
+    const calculatedVolume = length * breadth * height;
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      volume: calculatedVolume.toString(),
+    }));
+  }, [formData.length, formData.breadth, formData.height]);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const updatedData: Partial<ProductFormData> = {
+      [e.target.name]: e.target.value,
+    };
+
+    if (e.target.name === "locationType") {
+      const filteredCells = warehouseCells.find(
+        (cell) => cell.warehouseName === e.target.value
+      );
+      setLocation(filteredCells ? filteredCells.cells : []);
+    }
+
+    if (e.target.name === "vendorDetails") {
+      const filteredVendors = vendors.find(
+        (vendor) => vendor.fullName === e.target.value
+      );
+
+      if (filteredVendors) {
+        console.log(filteredVendors._id);
+        updatedData.vendorId = filteredVendors._id;
+      }
+    }
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ...updatedData,
+    }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,21 +169,68 @@ const AddInventoryForm: React.FC = () => {
     }
   };
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [productDetails, setProductDetails] = useState({
-    name: "Product Name",
-    price: "£0.00",
+  const [selectedImage] = useState<string | null>(null);
+  const [productDetails] = useState({
+    name: "DEMO NAME",
+    price: "£10.00",
     category: "Category",
-    stock: "0",
+    stock: "100",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitted Data:", formData);
+
+    const formDataToSend = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "images" && Array.isArray(value)) {
+        value.forEach((file) => formDataToSend.append("images", file));
+      } else {
+        formDataToSend.append(key, value as string);
+      }
+    });
+
+    try {
+      setLoading(true);
+      const response = await inventoryService.addNewProduct(formDataToSend);
+      // console.log(response);
+      if (response.status === 201) {
+        setFormData({
+          productName: "",
+          costPrice: "",
+          sellPrice: "",
+          discountPrice: "",
+          stock: "",
+          location: "",
+          locationType: "",
+          volume: "",
+          weight: "",
+          length: "",
+          breadth: "",
+          height: "",
+          countryOfOrigin: "",
+          category: "",
+          images: [],
+          minQuantityAlert: "",
+          lowStockAlert: "",
+          vendorDetails: "",
+          quantity: "",
+          productDescription: "",
+          vendorId: "",
+        });
+        setLoading(false);
+        alert("Product created successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      alert("Failed to create product");
+    }
   };
 
   return (
-    <div className="flex flex-col md:flex-row flex-wrap gap-4 h-auto mb-4  bg-amber-100 ">
+    <div className="flex flex-col md:flex-row flex-wrap gap-4 h-auto mb-4  bg-amber-100  dark:bg-gray-800">
       <div className="flex-8/12 max-w-6xl   bg-surface-light dark:bg-surface-dark shadow-lg p-6 rounded-xl border border-border-light dark:border-border-dark">
         <h2 className="text-2xl font-bold text-primary dark:text-primary-light text-center">
           📦 Add Inventory
@@ -89,6 +244,31 @@ const AddInventoryForm: React.FC = () => {
             label="Product Name"
             name="productName"
             placeholder="Enter Product Name"
+            handleChange={handleChange}
+          />
+
+          <FormInput
+            label="Country of Origin"
+            name="countryOfOrigin"
+            placeholder="Enter Country of Origin"
+            handleChange={handleChange}
+          />
+
+          <FormInput
+            label="Category"
+            name="category"
+            placeholder="Select Category"
+            isSelect={true}
+            options={categories.map((category) => category.categoryName)}
+            handleChange={handleChange}
+          />
+
+          <FormInput
+            label="Vendor Details"
+            name="vendorDetails"
+            placeholder="Select Vendor"
+            isSelect={true}
+            options={vendors.map((vendor) => vendor.fullName)}
             handleChange={handleChange}
           />
 
@@ -113,28 +293,6 @@ const AddInventoryForm: React.FC = () => {
             name="discountPrice"
             type="number"
             placeholder="Enter Discount Price"
-            handleChange={handleChange}
-          />
-
-          <FormInput
-            label="Stock"
-            name="stock"
-            type="number"
-            placeholder="Available Stock"
-            handleChange={handleChange}
-          />
-
-          <FormInput
-            label="Storage Location"
-            name="location"
-            placeholder="Enter Location"
-            handleChange={handleChange}
-          />
-
-          <FormInput
-            label="Size"
-            name="size"
-            placeholder="Enter Size"
             handleChange={handleChange}
           />
 
@@ -165,33 +323,32 @@ const AddInventoryForm: React.FC = () => {
           />
 
           <FormInput
-            label="Country of Origin"
-            name="countryOfOrigin"
-            placeholder="Enter Country of Origin"
+            label="Volume (cm3)"
+            name="volume"
+            placeholder="Volume"
+            type="number"
+            // handleChange={handleChange}
+            value={formData.volume}
+            disabled={true}
+          />
+
+          <FormInput
+            label="Storage Type"
+            name="locationType"
+            placeholder="select Location type"
+            isSelect={true}
+            options={warehouseTypes.map(
+              (warehouseType) => warehouseType.warehouseName
+            )}
             handleChange={handleChange}
           />
 
           <FormInput
-            label="Category"
-            name="category"
-            placeholder="Select Category"
+            label="Storage Location"
+            name="location"
+            placeholder="Enter Location"
             isSelect={true}
-            options={[
-              "Electronics",
-              "Fashion",
-              "Home & Kitchen",
-              "Sports",
-              "Toys",
-            ]}
-            handleChange={handleChange}
-          />
-
-          <FormInput
-            label="Vendor Details"
-            name="vendorDetails"
-            placeholder="Select Vendor"
-            isSelect={true}
-            options={["Vendor A", "Vendor B", "Vendor C"]}
+            options={location.map((location) => location.location)}
             handleChange={handleChange}
           />
 
@@ -218,15 +375,22 @@ const AddInventoryForm: React.FC = () => {
             placeholder="Enter Quantity"
             handleChange={handleChange}
           />
+          <FormInput
+            label="Available Stock"
+            name="stock"
+            type="number"
+            placeholder="Available Stock"
+            handleChange={handleChange}
+          />
 
           <div className="md:col-span-2">
             <label className="block text-md font-medium text-text-light dark:text-text-dark">
-              Additional Details
+              Product Description
             </label>
             <textarea
-              name="additionalDetails"
+              name="productDescription"
               className="textarea rounded-2xl w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-              placeholder="Enter additional details..."
+              placeholder="Enter Product Description..."
               onChange={handleChange}
             ></textarea>
           </div>

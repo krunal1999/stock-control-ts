@@ -27,8 +27,11 @@ const ProductUpdate = lazy(
 );
 const CategoryPage = lazy(() => import("./pages/admindashboard/CategoryPage"));
 const WarehouseComponent = lazy(
-  () => import("./pages/admindashboard/Warehouse")
+  () => import("./pages/admindashboard/WarehouseComponent")
 );
+
+// const Warehouse = lazy(() => import("./pages/admindashboard/Warehouse"));
+
 const VendorManagement = lazy(
   () => import("./pages/admindashboard/VendorManagement")
 );
@@ -47,6 +50,7 @@ const DashboardReport = lazy(
 const DashboardData = lazy(
   () => import("./pages/admindashboard/DashboardData")
 );
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -126,14 +130,14 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
-        <Route
+        {/* <Route
           path="warehouse"
           element={
             <Suspense fallback={<Loader />}>
-              <WarehouseComponent />
+              <Warehouse />
             </Suspense>
           }
-        />
+        /> */}
         <Route
           path="vendor"
           element={
@@ -179,6 +183,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <DashboardData />
+            </Suspense>
+          }
+        />
+        <Route
+          path="warehouse1"
+          element={
+            <Suspense fallback={<Loader />}>
+              <WarehouseComponent />
             </Suspense>
           }
         />

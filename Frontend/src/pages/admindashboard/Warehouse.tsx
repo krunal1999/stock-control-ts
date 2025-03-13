@@ -16,7 +16,7 @@ class Warehouse {
 
   // Finds the given number of empty cells in the grid.
   findEmptyLocations(count: number): { row: number; col: number }[] | null {
-    let locations: { row: number; col: number }[] = [];
+    const locations: { row: number; col: number }[] = [];
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         if (this.grid[row][col] === null) {

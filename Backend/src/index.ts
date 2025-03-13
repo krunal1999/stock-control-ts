@@ -5,6 +5,7 @@ import { connectDB } from "./config/db";
 import cookieParser from "cookie-parser";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
+import multer from "multer";
 
 dotenv.config();
 
@@ -18,14 +19,16 @@ app.use(
   })
 );
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
     limit: "16kb",
   })
 );
-
-app.use(express.json());
 
 connectDB()
   .then(() => {

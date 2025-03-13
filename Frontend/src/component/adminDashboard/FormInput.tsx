@@ -6,6 +6,8 @@ export const FormInput = ({
   options = [],
   isSelect = false,
   handleChange,
+  value,
+  disabled,
 }: {
   label: string;
   name: string;
@@ -13,7 +15,9 @@ export const FormInput = ({
   placeholder: string;
   options?: string[];
   isSelect?: boolean;
-  handleChange: (
+  value?: string | number;
+  disabled?: boolean;
+  handleChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => void;
 }) => {
@@ -43,6 +47,8 @@ export const FormInput = ({
           className="input rounded-2xl w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
           placeholder={placeholder}
           onChange={handleChange}
+          value={value}
+          disabled={disabled}
           required
         />
       )}
