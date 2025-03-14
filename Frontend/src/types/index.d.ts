@@ -54,3 +54,12 @@ export interface ProductFormData {
   productDescription: string;
   vendorId: string;
 }
+
+export interface PurchaseOrder {
+  _id: string;
+  orderId: string;
+  purchaseID: string;
+  vendorName: string;
+  status: string;
+  productRef?: string | null;
+}

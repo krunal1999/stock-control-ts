@@ -1,5 +1,5 @@
 import axios from "axios";
-import { purchaseData } from "../types/index.d";
+import { purchaseData, PurchaseOrder } from "../types/index.d";
 
 const apiUrl = import.meta.env.VITE_BACKEND_API_URL as string;
 
@@ -20,6 +20,12 @@ class PurchaseService {
   }
   updatePurchaseOrder(id: string) {
     return axiosInstance.put(`/admin/purchase/${id}`);
+  }
+  addPurchaseOrderToInventory(data: PurchaseOrder) {
+    return axiosInstance.put(`/admin/inventory/product/add-to-inventory`, data);
+  }
+  updatePurchaseOrderComplete(id: string) {
+    return axiosInstance.put(`/admin/purchase/complete/${id}`);
   }
 }
 

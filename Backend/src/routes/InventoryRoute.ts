@@ -4,7 +4,11 @@ import {
   createCategory,
   deleteCategory,
 } from "../handlers/CategoryHandler";
-import { createProduct, getAllProducts } from "../handlers/ProductHandler";
+import {
+  createProduct,
+  getAllProducts,
+  addProductToInventory,
+} from "../handlers/ProductHandler";
 import multer from "multer";
 
 const router = Router();
@@ -47,9 +51,6 @@ router.post(
   }
 );
 
-// router.delete("/product/:productId", deleteProduct);
-
-// router.get("/", );
-// router.post("/", );
+router.put("/product/add-to-inventory", addProductToInventory);
 
 export default router;

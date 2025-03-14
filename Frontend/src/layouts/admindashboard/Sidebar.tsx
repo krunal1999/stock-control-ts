@@ -125,6 +125,7 @@ const Sidebar: React.FC = () => {
         { label: "Category", path: "/admin/category" },
         // { label: "Warehouse", path: "/admin/warehouse" },
         { label: "Warehouse", path: "/admin/warehouse1" },
+        { label: "Manage Warehouse", path: "/admin/createwarehouse" },
       ],
     },
     {

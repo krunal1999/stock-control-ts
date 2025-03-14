@@ -4,6 +4,7 @@ enum PurchaseStatus {
   PENDING = "Pending",
   RECEIVED = "Received",
   CANCELLED = "Cancelled",
+  COMPLETED = "Completed",
 }
 
 interface IPurchase extends Document {

@@ -44,7 +44,7 @@ const WarehouseComponent: React.FC = () => {
             ? selectedWarehouse
             : warehouseTypes.data.data[0].warehouseName
         );
-        console.log(warehouseByType.data.data.cells);
+        // console.log(warehouseByType.data.data.cells);
         setWarehouse(warehouseByType.data.data);
       } catch (error) {
         console.error("Error fetching warehouse:", error);
@@ -111,7 +111,7 @@ const WarehouseComponent: React.FC = () => {
           className="w-1/2 p-2 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-4"
         />
       </div>
-      <div className="grid grid-cols-6 gap-8 max-w-8xl mx-auto dark:bg-gray-900 p-4 rounded-xl">
+      <div className="grid grid-cols-4 gap-8 max-w-8xl mx-auto dark:bg-gray-900 p-4 rounded-xl">
         {filteredCells?.map((cell) => (
           <div className="w-full max-w-md p-5 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

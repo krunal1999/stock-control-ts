@@ -50,6 +50,9 @@ const DashboardReport = lazy(
 const DashboardData = lazy(
   () => import("./pages/admindashboard/DashboardData")
 );
+const WarehousePage = lazy(
+  () => import("./pages/admindashboard/WarehousePage")
+);
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -191,6 +194,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <WarehouseComponent />
+            </Suspense>
+          }
+        />
+        <Route
+          path="createwarehouse"
+          element={
+            <Suspense fallback={<Loader />}>
+              <WarehousePage />
             </Suspense>
           }
         />

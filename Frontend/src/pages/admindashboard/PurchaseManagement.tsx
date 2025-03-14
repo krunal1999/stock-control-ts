@@ -2,20 +2,24 @@ import React, { useEffect, useReducer, useState } from "react";
 import { HiPlusCircle, HiX } from "react-icons/hi";
 import vendorservice from "../../services/VendorServices";
 import purchaseservice from "../../services/PurchaseService";
+import inventoryService from "../../services/InventoryService";
+import categoryService from "../../services/CategoryServices";
 // Interfaces
 interface Vendor {
   _id: string;
   fullName: string;
 }
 
-interface Product {
-  _id: string;
-  name: string;
+interface Product1 {
+  _id?: string;
+  productName?: string;
+  vendorDetails?: string;
+  category?: string;
 }
 
-interface Category {
-  id: number;
-  name: string;
+interface Category1 {
+  _id: string;
+  categoryName: string;
 }
 
 interface PurchaseState {
@@ -23,6 +27,7 @@ interface PurchaseState {
   selectedProduct: string;
   totalQuantity: string;
   selectedCategory: string;
+  newProductName: string;
   error: string;
 }
 
@@ -40,6 +45,7 @@ const purchaseReducer = (state: PurchaseState, action: any): PurchaseState => {
         totalQuantity: "",
         selectedCategory: "",
         error: "",
+        newProductName: "",
       };
     default:
       return state;
@@ -48,9 +54,10 @@ const purchaseReducer = (state: PurchaseState, action: any): PurchaseState => {
 
 const PurchaseManagement: React.FC = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [products, setProducts] = useState<Product1[]>([]);
+  const [categories, setCategories] = useState<Category1[]>([]);
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isNewProduct, setIsNewProduct] = useState(false);
 
   const [state, dispatch] = useReducer(purchaseReducer, {
     selectedVendor: "",
@@ -58,6 +65,7 @@ const PurchaseManagement: React.FC = () => {
     totalQuantity: "",
     selectedCategory: "",
     error: "",
+    newProductName: "",
   });
 
   // Fetch Data (Vendors, Products, Categories)
@@ -75,27 +83,64 @@ const PurchaseManagement: React.FC = () => {
       }
     };
 
+    const fetchProducts = async () => {
+      const response = await inventoryService.getAllProducts();
+      const productList = response.data.data.map((product: Product1) => ({
+        _id: product._id,
+        productName: product.productName,
+        vendorDetails: product.vendorDetails,
+        category: product.category,
+      }));
+      // console.log(productList);
+      setProducts(productList);
+    };
+
+    const fetchCategories = async () => {
+      const response = await categoryService.getAllCategories();
+      const categoryList = response.data.data.map((category: Category1) => ({
+        _id: category._id,
+        categoryName: category.categoryName,
+      }));
+      // console.log(categoryList);
+      setCategories(categoryList);
+    };
+
+    fetchProducts();
     fetchVendors();
-
-    setProducts([
-      { _id: "1", name: "Product A" },
-      { _id: "2", name: "Product B" },
-    ]);
-
-    setCategories([
-      { id: 1, name: "Category A" },
-      { id: 2, name: "Category B" },
-      { id: 3, name: "Category C" },
-    ]);
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (state.selectedProduct.length !== 0) {
+      const getProduct = products?.find(
+        (p) => p.productName === state.selectedProduct
+      );
+      console.log(getProduct);
+      dispatch({
+        type: "SET_FIELD",
+        field: "selectedCategory",
+        value: getProduct?.category,
+      });
+      dispatch({
+        type: "SET_FIELD",
+        field: "selectedVendor",
+        value: getProduct?.vendorDetails,
+      });
+
+      setIsDisabled(false);
+    } else {
+      setIsNewProduct(true);
+      setIsDisabled(true);
+    }
+  }, [state.selectedProduct, products, state.newProductName]);
 
   // Handle Save
   const handleSave = async () => {
     if (
-      !state.selectedVendor ||
-      !state.selectedProduct ||
       !state.totalQuantity ||
-      !state.selectedCategory
+      !state.selectedCategory ||
+      !state.selectedVendor ||
+      (state.selectedProduct && state.newProductName)
     ) {
       dispatch({ type: "SET_ERROR", error: "⚠️ Please fill all fields." });
       return;
@@ -104,16 +149,22 @@ const PurchaseManagement: React.FC = () => {
     dispatch({ type: "SET_ERROR", error: "" });
 
     const vendor = vendors.find((v) => v.fullName === state.selectedVendor);
-    const product = products.find((p) => p.name === state.selectedProduct);
+    const product = products.find(
+      (p) => p.productName === state.selectedProduct
+    );
+    console.log(product);
 
     const purchaseData = {
       vendor: state.selectedVendor,
-      product: state.selectedProduct,
+      product: state.selectedProduct
+        ? state.selectedProduct
+        : state.newProductName,
       quantity: state.totalQuantity,
       category: state.selectedCategory,
       vendorId: vendor?._id || "",
       productId: product?._id ? product?._id : null,
     };
+    console.log(purchaseData);
 
     try {
       const response = await purchaseservice.createPurchaaseOrder(purchaseData);
@@ -135,144 +186,128 @@ const PurchaseManagement: React.FC = () => {
       </h2>
 
       <div className="grid grid-cols-1 gap-4 mt-6">
-        {/* Vendor Selection */}
-        <div>
-          <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Select Vendor
-          </label>
-          <select
-            className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={state.selectedVendor}
-            onChange={(e) =>
-              dispatch({
-                type: "SET_FIELD",
-                field: "selectedVendor",
-                value: e.target.value,
-              })
-            }
-          >
-            <option value="">Choose a Vendor</option>
-            {vendors.map((vendor) => (
-              <option key={vendor._id} value={vendor.fullName}>
-                {vendor.fullName}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Product Selection */}
-        <div className="relative">
-          <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Select From Existing Products
-          </label>
-          <input
-            type="text"
-            className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={state.selectedProduct}
-            onChange={(e) =>
-              dispatch({
-                type: "SET_FIELD",
-                field: "selectedProduct",
-                value: e.target.value,
-              })
-            }
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Choose or Enter a Product"
-          />
-
-          {showDropdown && (
-            <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-20 rounded-lg max-h-40 overflow-y-auto dark:bg-gray-800 dark:text-white ">
-              {products.map((product) => (
-                <li
-                  key={product._id}
-                  className="p-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-gray-600"
-                  onClick={() => {
-                    dispatch({
-                      type: "SET_FIELD",
-                      field: "selectedProduct",
-                      value: product.name,
-                    });
-                    setShowDropdown(false);
-                  }}
-                >
-                  {product.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="relative">
-          <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Add New Product
-          </label>
-          <input
-            list="productList"
-            className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark relative z-10"
-            value={state.selectedProduct}
-            onChange={(e) =>
-              dispatch({
-                type: "SET_FIELD",
-                field: "selectedProduct",
-                value: e.target.value,
-              })
-            }
-            placeholder="Choose or Enter a Product"
-          />
-          <datalist
-            id="productList"
-            className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-20"
-          >
-            {products.map((product) => (
-              <option key={product._id} value={product.name} />
-            ))}
-          </datalist>
-        </div>
-
-        {/* Quantity Input */}
-        <div>
-          <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Total Quantity
-          </label>
-          <input
-            type="number"
-            placeholder="Enter Quantity"
-            className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={state.totalQuantity}
-            onChange={(e) =>
-              dispatch({
-                type: "SET_FIELD",
-                field: "totalQuantity",
-                value: e.target.value,
-              })
-            }
-          />
-        </div>
-
-        {/* Category Selection */}
-        <div>
-          <label className="block text-md font-medium text-text-light dark:text-text-dark">
-            Select Category
-          </label>
+        {isNewProduct ? (
           <select
             className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
-            value={state.selectedCategory}
+            value={state.selectedProduct}
             onChange={(e) =>
               dispatch({
                 type: "SET_FIELD",
-                field: "selectedCategory",
+                field: "selectedProduct",
                 value: e.target.value,
               })
             }
           >
-            <option value="">Choose a Category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.name}
+            <option value="">Choose Existing Product</option>
+            {products.map((product) => (
+              <option key={product._id} value={product.productName}>
+                {product.productName}
               </option>
             ))}
           </select>
-        </div>
+        ) : null}
+
+        {/* Vendor Selection */}
+        {isDisabled ? (
+          <>
+            <div>
+              <label className="block text-md font-medium text-text-light dark:text-text-dark">
+                Select Vendor
+              </label>
+              <select
+                className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
+                value={state.selectedVendor}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "selectedVendor",
+                    value: e.target.value,
+                  })
+                }
+              >
+                <option value="">Choose a Vendor</option>
+                {vendors.map((vendor) => (
+                  <option key={vendor._id} value={vendor.fullName}>
+                    {vendor.fullName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="relative">
+              <label className="block text-md font-medium text-text-light dark:text-text-dark">
+                Add New Product
+              </label>
+              <input
+                list="productList"
+                className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark relative z-10"
+                value={state.newProductName}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "newProductName",
+                    value: e.target.value,
+                  })
+                }
+                placeholder="Choose or Enter a Product"
+              />
+              <datalist
+                id="productList"
+                className="absolute top-full left-0 w-full bg-white border border-gray-300 shadow-md z-20"
+              >
+                {products.map((product) => (
+                  <option key={product._id} value={product.productName} />
+                ))}
+              </datalist>
+            </div>
+
+            {/* Category Selection */}
+            <div>
+              <label className="block text-md font-medium text-text-light dark:text-text-dark">
+                Select Category
+              </label>
+              <select
+                className="select rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
+                value={state.selectedCategory}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "selectedCategory",
+                    value: e.target.value,
+                  })
+                }
+              >
+                <option value="">Choose a Category</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category.categoryName}>
+                    {category.categoryName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
+        ) : null}
+      </div>
+
+      {/* Quantity Input */}
+      <div>
+        <label className="block text-md font-medium text-text-light dark:text-text-dark">
+          Total Quantity
+        </label>
+        <input
+          type="number"
+          placeholder="Enter Quantity"
+          className="input rounded-lg w-full border border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark"
+          value={state.totalQuantity}
+          onChange={(e) =>
+            dispatch({
+              type: "SET_FIELD",
+              field: "totalQuantity",
+              value: e.target.value,
+            })
+          }
+        />
       </div>
 
       {/* Error Message */}

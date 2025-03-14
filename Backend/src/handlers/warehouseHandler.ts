@@ -182,7 +182,7 @@ export const allocateStorage = async ({
 
     if (allocatedCells.length > 0) {
       let tempproductVolume = productVolume;
-      const updatedCells = allocatedCells.map((cell: any) => {
+      const updatedCells = allocatedCells?.map((cell: any) => {
         if (tempproductVolume > 0) {
           const volumeToStore = Math.min(tempproductVolume, cell.totalVolume);
 
@@ -209,7 +209,7 @@ export const getWarehouseByType = async (
 ): Promise<any> => {
   try {
     const { warehouseName } = req.params;
-    console.log(warehouseName);
+    // console.log(warehouseName);
 
     let warehouse;
 

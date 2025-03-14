@@ -1,35 +1,75 @@
-import React, { useState } from "react";
-import { ProductData } from "../../assets/DummyProductList";
+import React, { useEffect, useState } from "react";
+// import { ProductData } from "../../assets/DummyProductList";
 import { HiPencilAlt, HiTrash } from "react-icons/hi";
+import inventoryService from "../../services/InventoryService";
+import categoryService from "../../services/CategoryServices";
 
 interface Product {
-  id: number;
-  name: string;
-  category: string;
-  stock: number;
+  _id?: string;
+  productName: string;
+  costPrice: string;
+  sellPrice: string;
+  discountPrice: string;
+  stock: string;
   location: string;
-  image: string;
+  locationType: string;
+  volume: string;
+  weight: string;
+  length: string;
+  breadth: string;
+  height: string;
+  countryOfOrigin: string;
+  category: string;
+  images: string[];
+  minQuantityAlert: string;
+  lowStockAlert: string;
+  vendorDetails: string;
+  quantity: string;
+  productDescription: string;
+  vendorId: string;
+  warehouseName: string;
+}
+
+interface Category {
+  _id: string;
+  categoryName: string;
 }
 
 const ProductUpdate: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [categories, setCategories] = useState<Category[]>();
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 6;
+  const [products, setProducts] = useState<Product[]>();
 
-  const [products, setProducts] = useState<Product[]>(ProductData);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await inventoryService.getAllProducts();
+      // console.log(response.data.data);
+      setProducts(response.data.data);
 
-  const handleDelete = (id: number) => {
-    setProducts(products.filter((product) => product.id !== id));
+      const getCategories = async () => {
+        const response = await categoryService.getAllCategories();
+        // console.log(response.data.data);
+        setCategories(response.data.data);
+      };
+      getCategories();
+    };
+    fetchProducts();
+  }, []);
+
+  const handleDelete = (id: string) => {
+    setProducts(products?.filter((product) => product._id !== id));
   };
 
-  const filteredProducts = products.filter(
+  const filteredProducts = (products || [])?.filter(
     (product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
       (filterCategory ? product.category === filterCategory : true)
   );
 
-  const paginatedProducts = filteredProducts.slice(
+  const paginatedProducts = filteredProducts?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -54,9 +94,11 @@ const ProductUpdate: React.FC = () => {
           onChange={(e) => setFilterCategory(e.target.value)}
         >
           <option value="">All Categories</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Furniture">Furniture</option>
-          <option value="Clothing">Clothing</option>
+          {categories?.map((category) => (
+            <option key={category._id} value={category.categoryName}>
+              {category.categoryName}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -74,41 +116,42 @@ const ProductUpdate: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedProducts.length > 0 ? (
-              paginatedProducts.map((product) => (
+            {paginatedProducts && paginatedProducts?.length > 0 ? (
+              paginatedProducts?.map((product) => (
                 <tr
-                  key={product.id}
+                  key={product._id}
                   className="border-b border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                 >
                   {/* Image */}
                   <td className="p-3 text-center">
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src={product.images[0]}
+                      alt={product.productName}
                       className="w-12 h-12 rounded-full border border-gray-300 dark:border-gray-600 shadow-sm"
                     />
                   </td>
 
                   {/* Product Name */}
-                  <td className="p-3 font-semibold">{product.name}</td>
+                  <td className="p-3 font-semibold">{product.productName}</td>
 
                   {/* Category */}
                   <td className="p-3">{product.category}</td>
 
                   {/* Stock */}
-                  <td className="p-3 font-semibold">{product.stock}</td>
+                  <td className="p-3 font-semibold">{product.quantity}</td>
 
                   {/* Location */}
-                  <td className="p-3">{product.location}</td>
+                  <td className="p-3">{product.warehouseName}</td>
 
                   {/* Actions */}
                   <td className="p-3 flex justify-center gap-3">
-                    <button className="btn btn-md bg-amber-300 flex items-center gap-1">
+                    <button className="btn btn-md bg-amber-300 flex items-center gap-1 dark:text-black">
                       <HiPencilAlt className="text-lg" /> Edit
                     </button>
                     <button
-                      className="btn btn-md bg-red-600 flex items-center gap-1 text-black"
-                      onClick={() => handleDelete(product.id)}
+                      className="btn btn-md bg-red-600 flex items-center gap-1 text-black dark:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => handleDelete(product?._id || "")}
+                      disabled={true}
                     >
                       <HiTrash className="text-lg" /> Delete
                     </button>

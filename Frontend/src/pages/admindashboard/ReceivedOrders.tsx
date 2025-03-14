@@ -9,6 +9,7 @@ interface PurchaseOrder {
   purchaseID: string;
   vendorName: string;
   status: string;
+  productRef?: string | null;
 }
 
 const ReceivedOrders: React.FC = () => {
@@ -22,11 +23,13 @@ const ReceivedOrders: React.FC = () => {
     const fetchPurchaseOrders = async () => {
       const response = await purchaseservice.getAllPurchaseOrder();
       console.log(response.data.data);
+
       const purchaseOrders = response.data.data.filter(
         (order: PurchaseOrder) => order.status === "Pending"
       );
       const receivedOrders = response.data.data.filter(
-        (order: PurchaseOrder) => order.status === "Received"
+        (order: PurchaseOrder) =>
+          order.status === "Received" && order.productRef !== null
       );
       setPurchaseOrders(purchaseOrders);
       setReceivedOrders(receivedOrders);
@@ -48,6 +51,32 @@ const ReceivedOrders: React.FC = () => {
       alert("Failed to receive order");
       setIsLoading(false);
       console.log(error);
+    }
+  };
+
+  const handleAddToInventory = async (orderId: string) => {
+    console.log(orderId);
+    const order = receivedOrders.find((o) => o.orderId === orderId);
+    console.log(order);
+
+    if (order?.productRef !== null && order) {
+      try {
+        setIsLoading(true);
+        const response = await purchaseservice.addPurchaseOrderToInventory(
+          order
+        );
+        if (response.status === 200) {
+          setIsLoading(false);
+          alert("Product added to inventory successfully");
+        }
+      } catch (error) {
+        setIsLoading(false);
+        alert("Failed to add product to inventory");
+        // console.log(error?.response?.data?.error);
+        alert(error?.response?.data?.error);
+      }
+    } else {
+      navigate(`/admin/add-product/`);
     }
   };
 
@@ -79,7 +108,7 @@ const ReceivedOrders: React.FC = () => {
         <button
           className="btn  btn-lg bg-green-400 text-black flex items-center gap-2 rounded-2xl  border border-gray-300 dark:border-gray-600 dark:bg-green-400 dark:text-white"
           disabled={!selectedPurchase}
-          onClick={() => navigate("/admin/add-product")}
+          onClick={() => handleAddToInventory(selectedPurchase)}
         >
           Add to Inventory
         </button>

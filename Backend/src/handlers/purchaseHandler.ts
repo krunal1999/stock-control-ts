@@ -21,9 +21,7 @@ export const createNewPurchase = async (
         .json({ message: "Quantity must be greater than 0." });
     }
 
-    const productRef = mongoose.Types.ObjectId.isValid(product)
-      ? product
-      : null;
+    const productRef = productId ? productId : null;
 
     const purchase = await Purchase.create({
       category,
@@ -79,6 +77,35 @@ export const updatePurchaseOrder = async (
         runValidators: true,
       }
     );
+
+    if (!purchase) {
+      return res
+        .status(404)
+        .json(new ApiError("Purchase order not found", 404));
+    }
+
+    res
+      .status(200)
+      .json(new ApiSuccess({ message: "Purchase order updated" }, 200));
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json(new ApiError("Failed to update purchase order", 500, error));
+  }
+};
+
+export const updatePurchaseOrderComplete = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const purchase = await Purchase.findByIdAndUpdate(id, {
+      status: "Completed",
+      orderComplete: true,
+    });
 
     if (!purchase) {
       return res
