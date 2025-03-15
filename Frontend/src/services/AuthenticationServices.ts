@@ -3,7 +3,7 @@ import { LoginFormData, RegisterFormData } from "types";
 
 const apiUrl = import.meta.env.VITE_BACKEND_API_URL as string;
 
-console.log(import.meta.env.VITE_BACKEND_API_URL);
+// console.log(import.meta.env.VITE_BACKEND_API_URL);
 
 const axiosInstance = axios.create({
   baseURL: apiUrl,

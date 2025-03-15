@@ -96,8 +96,8 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 3600000 / 2, // 30m in milliseconds
     });
 

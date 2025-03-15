@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
+import userServices from "../../services/UserServices";
 
 // Mock Product Data (Replace with actual API data if needed)
 const mockProducts = [
@@ -8,84 +9,84 @@ const mockProducts = [
     name: "Laptop",
     category: "Electronics",
     price: 1000,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 2,
     name: "Phone",
     category: "Electronics",
     price: 800,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 3,
     name: "Shoes",
     category: "Fashion",
     price: 120,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 4,
     name: "Watch",
     category: "Fashion",
     price: 250,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 5,
     name: "TV",
     category: "Electronics",
     price: 1500,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 6,
     name: "Chair",
     category: "Furniture",
     price: 200,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 7,
     name: "Table",
     category: "Furniture",
     price: 350,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 8,
     name: "Bag",
     category: "Fashion",
     price: 75,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 9,
     name: "Headphones",
     category: "Electronics",
     price: 180,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 10,
     name: "Microwave",
     category: "Appliances",
     price: 400,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 11,
     name: "Blender",
     category: "Appliances",
     price: 100,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
   {
     id: 12,
     name: "Jeans",
     category: "Fashion",
     price: 60,
-    imageUrl: "https://via.placeholder.com/150",
+    imageUrl: "https://placehold.co/600x400",
   },
 ];
 
@@ -101,6 +102,16 @@ const UserDashboard = () => {
   // Apply Filtering, Sorting, and Search
   useEffect(() => {
     let updatedProducts = [...products];
+    const getUserDetails = async () => {
+      try {
+        const userDetails = await userServices.getUserDetails();
+        console.log(userDetails);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    getUserDetails();
 
     // Search filter
     if (search.trim()) {
