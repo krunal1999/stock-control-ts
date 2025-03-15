@@ -1,183 +1,109 @@
 import { useEffect, useState } from "react";
-import { FaSearch, FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
-import userServices from "../../services/UserServices";
+import { FaSearch, FaSortAmountUp, FaSortAmountDown } from "react-icons/fa";
+import inventoryService from "../../services/InventoryService";
+import { useNavigate } from "react-router-dom";
 
-// Mock Product Data (Replace with actual API data if needed)
-const mockProducts = [
-  {
-    id: 1,
-    name: "Laptop",
-    category: "Electronics",
-    price: 1000,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 2,
-    name: "Phone",
-    category: "Electronics",
-    price: 800,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 3,
-    name: "Shoes",
-    category: "Fashion",
-    price: 120,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 4,
-    name: "Watch",
-    category: "Fashion",
-    price: 250,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 5,
-    name: "TV",
-    category: "Electronics",
-    price: 1500,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 6,
-    name: "Chair",
-    category: "Furniture",
-    price: 200,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 7,
-    name: "Table",
-    category: "Furniture",
-    price: 350,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 8,
-    name: "Bag",
-    category: "Fashion",
-    price: 75,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 9,
-    name: "Headphones",
-    category: "Electronics",
-    price: 180,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 10,
-    name: "Microwave",
-    category: "Appliances",
-    price: 400,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 11,
-    name: "Blender",
-    category: "Appliances",
-    price: 100,
-    imageUrl: "https://placehold.co/600x400",
-  },
-  {
-    id: 12,
-    name: "Jeans",
-    category: "Fashion",
-    price: 60,
-    imageUrl: "https://placehold.co/600x400",
-  },
-];
+interface Product {
+  _id?: string;
+  productName: string;
+  category: string;
+  sellPrice: number;
+  images: string[];
+  productDescription: string;
+}
 
-const UserDashboard = () => {
-  const [products] = useState(mockProducts); // Static data
-  const [filteredProducts, setFilteredProducts] = useState(products);
+const ProductList = () => {
+  const [products, setProducts] = useState<Product[]>();
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("name"); // Default sort by name
   const [category, setCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [sort, setSort] = useState("name");
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const productsPerPage = 12;
+  const navigate = useNavigate();
 
-  // Apply Filtering, Sorting, and Search
   useEffect(() => {
-    let updatedProducts = [...products];
-    const getUserDetails = async () => {
-      try {
-        const userDetails = await userServices.getUserDetails();
-        console.log(userDetails);
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
-    };
-
-    getUserDetails();
-
-    // Search filter
-    if (search.trim()) {
-      updatedProducts = updatedProducts.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase())
+    const fetchProducts = async () => {
+      const products = await inventoryService.getAllProducts();
+      // console.log(products.data.data);
+      const tempProducts = products.data.data;
+      const productData = tempProducts?.map((product: Product) => ({
+        _id: product._id,
+        productName: product.productName,
+        category: product.category,
+        sellPrice: product.sellPrice,
+        images: product.images,
+      }));
+      const getCategories = productData?.map(
+        (product: Product) => product.category
       );
-    }
+      const uniqueCategories = [...new Set(getCategories)];
 
-    // Category filter
-    if (category !== "All") {
-      updatedProducts = updatedProducts.filter((p) => p.category === category);
-    }
+      setCategories(uniqueCategories as string[]);
+      setProducts(productData);
+    };
+    fetchProducts();
+  }, []);
 
-    // Sorting
-    updatedProducts.sort((a, b) =>
-      sort === "name" ? a.name.localeCompare(b.name) : a.price - b.price
-    );
+  const filteredProducts =
+    products
+      ?.filter((product) =>
+        product.productName.toLowerCase().includes(search.toLowerCase())
+      )
+      .filter((product) => category === "All" || product.category === category)
+      .sort((a, b) =>
+        sort === "name"
+          ? a.productName.localeCompare(b.productName)
+          : a.sellPrice - b.sellPrice
+      ) || [];
 
-    setFilteredProducts(updatedProducts);
-    setPage(1); // Reset pagination when filtering
-  }, [search, sort, category, products]);
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredProducts.length / limit);
+  // Pagination
+  const totalPages = Math.ceil(filteredProducts?.length / productsPerPage);
   const paginatedProducts = filteredProducts.slice(
-    (page - 1) * limit,
-    page * limit
+    (page - 1) * productsPerPage,
+    page * productsPerPage
   );
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold text-center mb-6">Product List</h1>
+  const handleProductClick = (productId: string) => {
+    console.log(productId);
+    navigate(`/user/product/${productId}`);
+  };
 
-      {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row justify-between mb-4 gap-4">
-        {/* Search */}
-        <div className="flex items-center border rounded-lg overflow-hidden">
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold text-center text-primary dark:text-primary-light mb-6">
+        🛍️ Product List
+      </h1>
+      {/* sticky top-30 left-50 right-50 */}
+
+      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6  bg-white dark:bg-gray-800 z-10">
+        <div className="relative flex items-center w-full md:w-1/3">
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="p-2 w-full outline-none"
+            className="input input-bordered w-full pl-10 text-2xl p-2 rounded-lg border-2 border-gray-300"
           />
-          <button className="bg-blue-500 text-white p-2">
-            <FaSearch />
-          </button>
+          <FaSearch className="absolute left-3 text-gray-500 dark:text-gray-400" />
         </div>
 
-        {/* Category Filter */}
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="border px-4 py-2 rounded-lg"
+          className="select select-bordered text-xl  rounded-lg border-2 border-gray-300"
         >
           <option value="All">All Categories</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Fashion">Fashion</option>
-          <option value="Furniture">Furniture</option>
-          <option value="Appliances">Appliances</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
 
-        {/* Sorting */}
         <button
           onClick={() => setSort(sort === "name" ? "price" : "name")}
-          className="flex items-center bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300"
+          className="btn btn-outline flex items-center text-xl rounded-lg border-2 border-gray-300"
         >
           {sort === "name" ? (
             <FaSortAmountUp className="mr-2" />
@@ -188,55 +114,58 @@ const UserDashboard = () => {
         </button>
       </div>
 
-      {/* Product List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 h-full">
         {paginatedProducts.length === 0 ? (
-          <p className="text-center col-span-3">No products found</p>
+          <p className="text-center col-span-3 text-gray-500 dark:text-gray-400">
+            No products found
+          </p>
         ) : (
           paginatedProducts.map((product) => (
             <div
-              key={product.id}
-              className="border rounded-lg p-4 shadow-md bg-white"
+              key={product._id}
+              className="card shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+              onClick={() => handleProductClick(product._id as string)}
             >
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded"
-              />
-              <h2 className="text-xl font-semibold mt-2">{product.name}</h2>
-              <p className="text-gray-500">{product.category}</p>
-              <p className="text-lg font-bold text-blue-600">
-                ${product.price}
-              </p>
+              <figure className="p-4">
+                <img
+                  src={product.images[0]}
+                  alt={product.productName}
+                  className="w-full h-40 object-cover rounded-lg"
+                />
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title text-lg font-semibold">
+                  {product.productName}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {product.category}
+                </p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  ${product.sellPrice}
+                </p>
+              </div>
             </div>
           ))
         )}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 space-x-2">
+      <div className="flex justify-center items-center mt-8 space-x-2 text-2xl dark:text-white">
         <button
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
-          className={`px-4 py-2 rounded-lg ${
-            page === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-          }`}
+          className="btn  btn-xl rounded-lg border-2 border-gray-300 dark:text-white"
         >
           Prev
         </button>
-        <span className="text-lg">
+        <span className="text-lg font-semibold">
           {page} / {totalPages}
         </span>
         <button
           disabled={page >= totalPages}
           onClick={() => setPage(page + 1)}
-          className={`px-4 py-2 rounded-lg ${
-            page >= totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-          }`}
+          className="btn  btn-xl rounded-lg border-2 border-gray-300 dark:text-white"
         >
           Next
         </button>
@@ -245,4 +174,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default ProductList;
