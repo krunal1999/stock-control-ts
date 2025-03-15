@@ -42,6 +42,7 @@ export const registerUser = async (
       mobile,
       gender,
       password: hashedPassword,
+      role: "user",
     });
 
     const newUserCreated = await user.save();
@@ -62,6 +63,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     const { email, password } = req.body as LoginUserDTO;
 
     const user = await User.findOne({ email });
+    // console.log(user);
 
     if (!user) {
       return res
@@ -85,6 +87,13 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       }
     );
 
+    const userData = {
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.role,
+    };
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -92,7 +101,9 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       maxAge: 3600000 / 2, // 30m in milliseconds
     });
 
-    res.status(200).json(new ApiSuccess({ message: "Login successful" }, 200));
+    res
+      .status(200)
+      .json(new ApiSuccess({ message: "Login successful", userData }, 200));
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json(new ApiError("Login failed", 500, error));
@@ -103,4 +114,3 @@ export const logoutUser = async (req: Request, res: Response): Promise<any> => {
   res.clearCookie("accessToken");
   res.status(200).json(new ApiSuccess({ message: "Logout successful" }, 200));
 };
-

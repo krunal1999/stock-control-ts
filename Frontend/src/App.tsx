@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -8,6 +8,8 @@ import {
 import Layout from "./layouts/Layout";
 import LandingPage from "./pages/LandingPage";
 import Loader from "./component/Loader";
+import { Toaster } from "react-hot-toast";
+
 const LoginPage = lazy(() => import("./pages/authenticationPages/LoginPage"));
 const RegistrationPage = lazy(
   () => import("./pages/authenticationPages/RegistrationPage")
@@ -53,6 +55,8 @@ const DashboardData = lazy(
 const WarehousePage = lazy(
   () => import("./pages/admindashboard/WarehousePage")
 );
+const UserDashboard = lazy(() => import("./pages/userDashboard/UserDashboard"));
+const UserLayout = lazy(() => import("./layouts/userLayouts/userLayout"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,8 +79,17 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
+        {/* <Route
+          path="/explore"
+          element={
+            <Suspense fallback={<Loader />}>
+              <UserDashboard />
+            </Suspense>
+          }
+        /> */}
       </Route>
 
+      {/* Protected Routes For Admin */}
       <Route
         path="/admin"
         element={
@@ -133,14 +146,7 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
-        {/* <Route
-          path="warehouse"
-          element={
-            <Suspense fallback={<Loader />}>
-              <Warehouse />
-            </Suspense>
-          }
-        /> */}
+
         <Route
           path="vendor"
           element={
@@ -206,8 +212,32 @@ const router = createBrowserRouter(
           }
         />
       </Route>
+
+      {/* Protected Routes For User */}
+      <Route
+        path="/user"
+        element={
+          <Suspense fallback={<Loader />}>
+            <UserLayout />
+          </Suspense>
+        }
+      >
+        <Route
+          index
+          element={
+            <Suspense fallback={<Loader />}>
+              <UserDashboard />
+            </Suspense>
+          }
+        />
+      </Route>
     </>
   )
 );
-const App = () => <RouterProvider router={router} />;
+const App = () => (
+  <>
+    <Toaster position="top-right" reverseOrder={false} />
+    <RouterProvider router={router} />
+  </>
+);
 export default App;

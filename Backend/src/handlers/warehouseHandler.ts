@@ -110,7 +110,7 @@ export const getAvailableCellbyLocation = async (
           warehouse.cells = warehouse.cells.slice(0, 10); // Limit to 10 cells
         }
       });
-      console.log("Warehouses found:", warehouses);
+      // console.log("Warehouses found:", warehouses);
     } else {
       console.log("No warehouses found.");
     }

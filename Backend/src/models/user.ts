@@ -6,6 +6,7 @@ interface User extends Document {
   password: string;
   mobile: string;
   gender: string;
+  role: string;
   accessToken: string;
 }
 
@@ -16,6 +17,7 @@ const userSchema: Schema = new Schema(
     password: { type: String, required: true },
     mobile: { type: String, required: true },
     gender: { type: String, required: true },
+    role: { type: String, required: true, default: "user" },
     accessToken: { type: String },
   },
   { timestamps: true }

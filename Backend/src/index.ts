@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
 import multer from "multer";
-
+import createAdminUser from "./utils/createAdmin";
 dotenv.config();
 
 const app = express();
@@ -31,8 +31,9 @@ app.use(
 );
 
 connectDB()
-  .then(() => {
+  .then(async () => {
     console.log("MongoDB connected");
+    await createAdminUser();
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import authenticationServices from "../../services/AuthenticationServices";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../store/useAuth";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +18,8 @@ const LoginPage = () => {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -27,7 +32,7 @@ const LoginPage = () => {
   };
 
   const validateForm = (): boolean => {
-    let newErrors: { email?: string; password?: string; agree?: string } = {};
+    const newErrors: { email?: string; password?: string; agree?: string } = {};
 
     if (!formData.email.includes("@") || !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Invalid email format.";
@@ -41,7 +46,7 @@ const LoginPage = () => {
       newErrors.agree = "You must agree to the terms.";
     }
 
-    console.log(formData);
+    // console.log(formData);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -58,7 +63,7 @@ const LoginPage = () => {
       // Send request to backend
       const response = await authenticationServices.loginUserByEmail(formData);
 
-      console.log(response);
+      // console.log(response);
 
       if (response.status !== 200) {
         console.log(response.data);
@@ -66,12 +71,30 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         setMessage("Login successful!");
+        toast.success("Login successful!");
+
+        // console.log(response.data.data.userData);
+        const userRole = response.data.data.userData.role;
+        login(userRole);
+        localStorage.setItem("userRole", userRole);
+        localStorage.setItem(
+          "user",
+          JSON.stringify(response.data.data.userData)
+        );
+
+        if (userRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/user");
+        }
       } else {
         setMessage("Invalid login credentials.");
+        toast.error("Invalid login credentials.");
       }
     } catch (error) {
       console.log(error);
       setMessage("Something went wrong. Please try again.");
+      toast.error("Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

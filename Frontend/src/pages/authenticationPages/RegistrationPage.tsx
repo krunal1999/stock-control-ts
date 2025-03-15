@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { HiUser, HiMail, HiLockClosed, HiPhone } from "react-icons/hi";
 import { RegisterFormData } from "types";
 import authenticationServices from "../../services/AuthenticationServices";
-
+import toast from "react-hot-toast";
 const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
     fullName: "",
@@ -25,7 +25,7 @@ const Register: React.FC = () => {
   };
 
   const validateForm = (): boolean => {
-    let newErrors: Partial<RegisterFormData> = {};
+    const newErrors: Partial<RegisterFormData> = {};
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full Name is required.";
@@ -69,7 +69,7 @@ const Register: React.FC = () => {
         console.log(response.data);
       }
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         setMessage("Registration successful!");
         setFormData({
           fullName: "",
@@ -78,10 +78,12 @@ const Register: React.FC = () => {
           mobile: "",
           gender: "",
         });
+        toast.success("Registration successful!");
       }
     } catch (error) {
       console.error(error);
-      setMessage("Something went wrong. Please try again.");
+      setMessage("Something went wrong");
+      toast.error("Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -99,7 +101,9 @@ const Register: React.FC = () => {
           Register
         </h2>
 
-        {message && <p className="text-center text-green-600">{message}</p>}
+        {message && (
+          <p className="text-center text-green-600 text-xl">{message}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-6">
           {/* Full Name Field */}

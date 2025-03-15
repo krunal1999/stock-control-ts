@@ -1,14 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 // Import react-scroll
 import { HiMenu, HiX } from "react-icons/hi";
 import ThemeToggle from "./ThemeToggle";
+import useAuth from "../store/useAuth";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [dashboard, setDashboard] = useState("/");
+
+  const { isLoggedIn, userRole, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    if (userRole === "admin") {
+      setDashboard("/admin");
+    } else {
+      setDashboard("/user");
+    }
+  }, [userRole]);
 
   const handleNavigation = (section: string) => {
     if (location.pathname === "/") {
@@ -62,24 +79,35 @@ const Navbar: React.FC = () => {
           )}
         </ul>
 
-        {/* Action Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          <RouterLink
-            to="/login"
-            className="px-4 py-2 border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all duration-300 dark:text-white"
-          >
-            Login
-          </RouterLink>
-          <RouterLink
-            to="/register"
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
-          >
-            Register
-          </RouterLink>
-          <ThemeToggle />
-        </div>
+        {!isLoggedIn ? (
+          <div className="hidden md:flex items-center space-x-4">
+            <RouterLink
+              to="/login"
+              className="px-4 py-2 border-2 border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-all duration-300 dark:text-white"
+            >
+              Login
+            </RouterLink>
+            <RouterLink
+              to="/register"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+            >
+              Register
+            </RouterLink>
+            <ThemeToggle />
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center space-x-4">
+            <button onClick={handleLogout}>Logout</button>
+            <RouterLink
+              to={dashboard}
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+            >
+              {userRole === "admin" ? "Admin Dashboard" : "User Dashboard"}
+            </RouterLink>
+            <ThemeToggle />
+          </div>
+        )}
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden text-primary dark:text-primary-light focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
@@ -88,7 +116,6 @@ const Navbar: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-background-light dark:bg-background-dark shadow-md">
           <ul className="flex flex-col items-center space-y-4 py-4">
@@ -110,7 +137,6 @@ const Navbar: React.FC = () => {
             )}
           </ul>
 
-          {/* Mobile Action Buttons */}
           <div className="flex flex-col items-center space-y-3 py-4">
             <RouterLink
               to="/login"
@@ -128,7 +154,6 @@ const Navbar: React.FC = () => {
             </RouterLink>
           </div>
 
-          {/* Theme Toggle Button */}
           <div className="flex justify-center py-4">
             <ThemeToggle />
           </div>
