@@ -12,7 +12,7 @@ interface Product {
   productDescription: string;
 }
 
-const ProductList = () => {
+const UserDashboard = () => {
   const [products, setProducts] = useState<Product[]>();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
@@ -174,4 +174,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default UserDashboard;

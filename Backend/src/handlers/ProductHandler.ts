@@ -321,3 +321,16 @@ export const addProductToInventory = async (
       .json(new ApiError("Failed to add product to inventory", 500, error));
   }
 };
+
+export const getProductById = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { productId } = req.params;
+  try {
+    const product = await Product.findById(productId);
+    res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get product", 500, error));
+  }
+};

@@ -1,14 +1,16 @@
-import { Router, Request, Response, NextFunction } from "express";
-import { authenticateJWT, AuthRequest } from "../middleware/authMiddleware";
+import { NextFunction, Request, Response } from "express";
+import Product from "../models/Product";
+import { ApiError, ApiSuccess } from "../utils/api-response";
 
-const router = Router();
-
-router.get(
-  "/getuserdetails",
-  authenticateJWT,
-  (req: AuthRequest, res: Response) => {
-    res.json({ message: "This is a protected route", user: req.user });
+export const getProductById = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  const { productId } = req.params;
+  try {
+    const product = await Product.findById(productId);
+    res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get product", 500, error));
   }
-);
-
-export default router;
+};

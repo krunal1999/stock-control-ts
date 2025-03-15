@@ -24,6 +24,9 @@ class InventoryService {
   getAllProducts() {
     return axiosInstance.get("/admin/inventory/product");
   }
+  getProductById(id: string) {
+    return axiosInstance.get(`/admin/inventory/product/${id}`);
+  }
   //   updateProduct(id: string, data: any) {
   //     return axiosInstance.put(`/admin/product/${id}`, data);
   //   }

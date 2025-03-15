@@ -14,6 +14,11 @@ class UserServices {
   getUserDetails() {
     return axiosInstance.get("/users/userdashboard/getuserdetails");
   }
+  getProductDetails(productId: string) {
+    return axiosInstance.get(
+      `/users/userdashboard/getproductdetails/${productId}`
+    );
+  }
 }
 
 const userServices = new UserServices();

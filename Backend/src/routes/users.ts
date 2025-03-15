@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { loginUser, logoutUser, registerUser } from "../handlers/users";
 import { authenticateJWT, AuthRequest } from "../middleware/authMiddleware";
-import userDashboardRouter from "../handlers/UserDashboard";
+import userDashboardRouter from "./userDashboardRoute";
 const router = Router();
 
 router.post("/registeruser", registerUser);

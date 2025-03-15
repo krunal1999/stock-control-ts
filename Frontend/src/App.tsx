@@ -57,6 +57,7 @@ const WarehousePage = lazy(
 );
 const UserDashboard = lazy(() => import("./pages/userDashboard/UserDashboard"));
 const UserLayout = lazy(() => import("./layouts/userLayouts/userLayout"));
+const SingleProduct = lazy(() => import("./pages/userDashboard/SingleProduct"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -227,6 +228,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <UserDashboard />
+            </Suspense>
+          }
+        />
+        <Route
+          path="product/:productId"
+          element={
+            <Suspense fallback={<Loader />}>
+              <SingleProduct />
             </Suspense>
           }
         />
