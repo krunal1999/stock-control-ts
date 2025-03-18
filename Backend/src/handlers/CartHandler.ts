@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import Order from "../models/Orders";
 import { sendEmail } from "../utils/sendEmails";
 import user from "../models/user";
+import { generateInvoice } from "../utils/invoiceGenerator";
 
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
@@ -259,6 +260,7 @@ export const checkoutSuccess = async (
       paymentId: session.payment_intent || "",
     });
     const savedOrder = await newOrder.save();
+
     if (!savedOrder) {
       return res.status(500).json(new ApiError("Failed to create order", 500));
     }
@@ -268,6 +270,18 @@ export const checkoutSuccess = async (
 
     //send email to the user
     const user1 = await user.findById(userRef);
+
+    //generate invoice
+    const invoicePath = await generateInvoice({
+      orderId: savedOrder?._id as string,
+      userName: user1?.fullName || "",
+      userEmail: user1?.email || "",
+      paymentId: savedOrder.paymentId || "",
+      totalPaid: savedOrder.totalPaid || 0,
+      status: savedOrder.status || "",
+      orderStatus: savedOrder.orderStatus || "",
+      products: savedOrder.products,
+    });
 
     const emailSubject = `Order Confirmation - ${savedOrder._id}`;
     const emailContent = `
@@ -301,7 +315,8 @@ export const checkoutSuccess = async (
       user1?.email || "",
       emailSubject,
       emailContent,
-      "Order Confirmed"
+      "Order Confirmed",
+      invoicePath
     );
 
     if (!emailSent) {

@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config(); // Load environment variables
 
@@ -19,7 +20,8 @@ export const sendEmail = async (
   to: string,
   subject: string,
   html: string,
-  text: string
+  text: string,
+  attachmentPath?: string
 ) => {
   try {
     await transporter.sendMail({
@@ -28,6 +30,9 @@ export const sendEmail = async (
       subject,
       html,
       text,
+      attachments: attachmentPath
+        ? [{ filename: path.basename(attachmentPath), path: attachmentPath }]
+        : [],
     });
     // console.log(` Email sent to ${to}`);
     return true;
