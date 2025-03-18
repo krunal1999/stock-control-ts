@@ -6,6 +6,8 @@ import Cart from "../models/Cart";
 import dotenv from "dotenv";
 import Stripe from "stripe";
 import Order from "../models/Orders";
+import { sendEmail } from "../utils/sendEmails";
+import user from "../models/user";
 
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
@@ -17,7 +19,7 @@ export const addToCart = async (
   try {
     const { productId, quantity } = req.body;
     const userRef = req.user?.userId;
-    console.log("userRef", userRef);
+    // console.log("userRef", userRef);
 
     const product = await Product.findById(productId);
     // console.log("product", product);
@@ -224,7 +226,7 @@ export const checkoutCart = async (
     });
     // res.redirect(session.url || "");
     res.json({ url: session.url });
-    console.log(session);
+    // console.log(session);
   } catch (error) {
     res.status(500).json(new ApiError("Failed to checkout", 500, error));
   }
@@ -263,6 +265,48 @@ export const checkoutSuccess = async (
 
     //clear the cart
     await Cart.findOneAndDelete({ userRef });
+
+    //send email to the user
+    const user1 = await user.findById(userRef);
+
+    const emailSubject = `Order Confirmation - ${savedOrder._id}`;
+    const emailContent = `
+  <h2>Hi ${user1?.fullName},</h2>
+  <p>Thank you for your order! 🎉 Your payment was successful.</p>
+  
+  <h3>Order Details:</h3>
+  
+  <p><strong>Payment ID:</strong> ${savedOrder.paymentId}</p>
+  <p><strong>Total Paid:</strong> £${savedOrder.totalPaid.toFixed(2)}</p>
+  <p><strong>Payment Status:</strong> ${savedOrder.status}</p>
+  <p><strong>Order Status:</strong> ${savedOrder.orderStatus}</p>
+
+  <h3>Products Ordered:</h3>
+  <ul>
+    ${savedOrder.products
+      .map(
+        (p) =>
+          `<li>${p.productName} - Quantity: ${
+            p.quantity
+          } - Price: £${p.sellPrice.toFixed(2)}</li>`
+      )
+      .join("")}
+  </ul>
+
+  <p>We will notify you once your order is shipped! 🚀</p>
+  <p>Thank you for shopping with us.</p>
+`;
+    // Send the email
+    const emailSent = await sendEmail(
+      user1?.email || "",
+      emailSubject,
+      emailContent,
+      "Order Confirmed"
+    );
+
+    if (!emailSent) {
+      return res.status(500).json(new ApiError("Failed to send email", 500));
+    }
 
     // res.json({ session });
     res.status(200).json(new ApiSuccess("Order created successfully", 200));
