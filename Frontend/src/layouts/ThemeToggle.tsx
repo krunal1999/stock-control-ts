@@ -19,7 +19,7 @@ const ThemeToggle = () => {
       onClick={() => setTheme(theme === "dark" ? "cupcake" : "dark")}
       className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all"
     >
-      {theme === "dark" ? "☀ Light Mode" : "🌙 Dark Mode"}
+      {theme === "dark" ? "☀" : "🌙"}
     </button>
   );
 };

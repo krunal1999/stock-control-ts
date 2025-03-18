@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { FaShoppingCart, FaStar, FaHeart } from "react-icons/fa";
-import { useParams } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
+import { useNavigate, useParams } from "react-router-dom";
 import userServices from "../../services/UserServices";
-
+import cartService from "../../services/CartServicec";
+import toast from "react-hot-toast";
 interface Product {
   _id?: string;
   productName: string;
@@ -16,6 +17,8 @@ const SingleProduct = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState<Product>();
   const [mainImage, setMainImage] = useState(product?.images[0]);
+  const [quantity, setQuantity] = useState<number>(1);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -39,6 +42,24 @@ const SingleProduct = () => {
     };
     fetchProduct();
   }, [productId]);
+
+  const handleAddToCart = async (productId: string, quantity: number) => {
+    console.log(productId, quantity);
+
+    try {
+      const response = await cartService.addToCart(productId, quantity);
+      console.log(response);
+      if (response.status === 200) {
+        toast.success("Product added to cart");
+        navigate("/user/cart");
+      } else {
+        toast.error("Failed to add product to cart");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       {product && (
@@ -98,11 +119,39 @@ const SingleProduct = () => {
                 {product.productDescription}
               </p>
 
-              <div className="flex space-x-4 mt-4">
-                <button className="btn btn-xl bg-amber-400 flex items-center dark:text-white dark:bg-primary">
+              <div className="flex flex-col gap-4  mt-4">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="btn btn-xl bg-amber-400 flex items-center dark:text-white dark:bg-primary"
+                  >
+                    -
+                  </button>
+                  <span className="mx-2 text-xl p-4 font-semibold">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="btn btn-xl bg-amber-400 flex items-center dark:text-white dark:bg-primary"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  className="btn btn-xl bg-amber-400 flex items-center dark:text-white dark:bg-primary"
+                  onClick={() =>
+                    handleAddToCart(product._id as string, quantity)
+                  }
+                >
                   <FaShoppingCart className="mr-2" /> Add to Cart
                 </button>
-                <button className="btn btn-accent btn-xl">Buy Now</button>
+                <button
+                  className="btn btn-accent btn-xl"
+                  onClick={() => navigate("/user/cart")}
+                >
+                  View Cart
+                </button>
               </div>
             </div>
           </div>

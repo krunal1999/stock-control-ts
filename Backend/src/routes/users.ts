@@ -12,6 +12,6 @@ router.get("/protected", authenticateJWT, (req: AuthRequest, res: Response) => {
   res.json({ message: "This is a protected route", user: req.user });
 });
 
-router.use("/userdashboard", userDashboardRouter);
+router.use("/userdashboard", authenticateJWT, userDashboardRouter);
 
 export default router;

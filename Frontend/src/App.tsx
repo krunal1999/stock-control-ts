@@ -58,6 +58,7 @@ const WarehousePage = lazy(
 const UserDashboard = lazy(() => import("./pages/userDashboard/UserDashboard"));
 const UserLayout = lazy(() => import("./layouts/userLayouts/userLayout"));
 const SingleProduct = lazy(() => import("./pages/userDashboard/SingleProduct"));
+const Cart = lazy(() => import("./pages/userDashboard/Cart"));
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -236,6 +237,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <SingleProduct />
+            </Suspense>
+          }
+        />
+        <Route
+          path="cart"
+          element={
+            <Suspense fallback={<Loader />}>
+              <Cart />
             </Suspense>
           }
         />

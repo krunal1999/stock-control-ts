@@ -1,6 +1,12 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { authenticateJWT, AuthRequest } from "../middleware/authMiddleware";
 import { getProductById } from "../handlers/UserDashboard";
+import {
+  addToCart,
+  deleteCart,
+  getCart,
+  updateCart,
+} from "../handlers/CartHandler";
 const router = Router();
 
 router.get(
@@ -12,5 +18,10 @@ router.get(
 );
 
 router.get("/getproductdetails/:productId", getProductById);
+
+router.post("/addtocart", addToCart);
+router.get("/getcart", getCart);
+router.put("/updatecart", updateCart);
+router.delete("/deletecart/:productId", deleteCart);
 
 export default router;

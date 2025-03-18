@@ -71,7 +71,7 @@ const UserDashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold text-center text-primary dark:text-primary-light mb-6">
+      <h1 className="text-3xl font-bold text-center text-primary dark:text-white mb-6">
         🛍️ Product List
       </h1>
       {/* sticky top-30 left-50 right-50 */}
@@ -124,7 +124,7 @@ const UserDashboard = () => {
           paginatedProducts.map((product) => (
             <div
               key={product._id}
-              className="card shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+              className="card shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg dark:hover:shadow-primary-light hover:shadow-amber-200"
               onClick={() => handleProductClick(product._id as string)}
             >
               <figure className="p-4">

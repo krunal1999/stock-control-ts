@@ -51,7 +51,12 @@ const Navbar: React.FC = () => {
           to="/"
           className="text-3xl font-bold text-primary dark:text-primary-light transition-all"
         >
-          <img src="./Images/logo2_rbg.png" alt="Logo" className="h-12" />
+          {/* <img src="./Images/logo2_rbg.png" alt="Logo" className="h-12" /> */}
+          <img
+            src="../../public/Images/logo2_rbg.png"
+            alt="Logo"
+            className="h-12"
+          />
         </RouterLink>
 
         {/* Desktop Menu */}
@@ -102,7 +107,7 @@ const Navbar: React.FC = () => {
               to={dashboard}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
             >
-              {userRole === "admin" ? "Admin Dashboard" : "User Dashboard"}
+              {userRole === "admin" ? "Admin Dashboard" : "Dashboard"}
             </RouterLink>
             <ThemeToggle />
           </div>
