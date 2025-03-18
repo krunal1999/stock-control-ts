@@ -3,6 +3,8 @@ import { authenticateJWT, AuthRequest } from "../middleware/authMiddleware";
 import { getProductById } from "../handlers/UserDashboard";
 import {
   addToCart,
+  checkoutCart,
+  checkoutSuccess,
   deleteCart,
   getCart,
   updateCart,
@@ -23,5 +25,8 @@ router.post("/addtocart", addToCart);
 router.get("/getcart", getCart);
 router.put("/updatecart", updateCart);
 router.delete("/deletecart/:productId", deleteCart);
+
+router.post("/checkout", checkoutCart);
+router.get("/checkout/success", checkoutSuccess);
 
 export default router;

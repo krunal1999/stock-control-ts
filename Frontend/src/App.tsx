@@ -59,6 +59,13 @@ const UserDashboard = lazy(() => import("./pages/userDashboard/UserDashboard"));
 const UserLayout = lazy(() => import("./layouts/userLayouts/userLayout"));
 const SingleProduct = lazy(() => import("./pages/userDashboard/SingleProduct"));
 const Cart = lazy(() => import("./pages/userDashboard/Cart"));
+const Checkout = lazy(() => import("./pages/userDashboard/Checkout"));
+const CheckoutSuccessPage = lazy(
+  () => import("./pages/userDashboard/CheckoutSuccessPage")
+);
+const CheckoutCancel = lazy(
+  () => import("./pages/userDashboard/CheckoutCancel")
+);
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -245,6 +252,30 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <Cart />
+            </Suspense>
+          }
+        />
+        <Route
+          path="checkout"
+          element={
+            <Suspense fallback={<Loader />}>
+              <Checkout />
+            </Suspense>
+          }
+        />
+        <Route
+          path="checkout/success"
+          element={
+            <Suspense fallback={<Loader />}>
+              <CheckoutSuccessPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="checkout/cancel"
+          element={
+            <Suspense fallback={<Loader />}>
+              <CheckoutCancel />
             </Suspense>
           }
         />

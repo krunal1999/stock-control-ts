@@ -83,7 +83,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       { userId: user._id },
       process.env.JWT_SECRET || "secret",
       {
-        expiresIn: "30m",
+        expiresIn: "1d",
       }
     );
 

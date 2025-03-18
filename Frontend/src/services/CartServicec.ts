@@ -29,6 +29,14 @@ class CartService {
   deleteCart(productId: string) {
     return axiosInstance.delete(`/users/userdashboard/deletecart/${productId}`);
   }
+  checkoutCart() {
+    return axiosInstance.post("/users/userdashboard/checkout");
+  }
+  checkoutSuccess(sessionId: string) {
+    return axiosInstance.get(
+      `/users/userdashboard/checkout/success?session_id=${sessionId}`
+    );
+  }
 }
 
 const cartService = new CartService();

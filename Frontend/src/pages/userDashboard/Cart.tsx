@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import cartService from "../../services/CartServicec";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 interface CartProduct {
   productId: string;
@@ -18,6 +19,7 @@ interface Cart {
 
 const Cart = () => {
   const [cart, setCart] = useState<Cart | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCart();
@@ -74,9 +76,19 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg transition-all duration-300">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-        Shopping Cart
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+          Shopping Cart
+        </h2>
+        {cart && cart.products?.length > 0 ? (
+          <button
+            onClick={() => navigate("/user/checkout")}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          >
+            Checkout
+          </button>
+        ) : null}
+      </div>
 
       {cart && cart.products?.length > 0 ? (
         <div>
@@ -128,7 +140,7 @@ const Cart = () => {
               {/* Remove Button */}
               <button
                 onClick={() => removeItem(item.productId)}
-                className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition"
+                className=" hover:text-red-600 dark:hover:text-red-300  px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
               >
                 Remove
               </button>

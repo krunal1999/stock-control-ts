@@ -3,6 +3,7 @@ import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 // Import react-scroll
 import { HiMenu, HiX } from "react-icons/hi";
+import { FiShoppingCart } from "react-icons/fi";
 import ThemeToggle from "./ThemeToggle";
 import useAuth from "../store/useAuth";
 
@@ -102,12 +103,23 @@ const Navbar: React.FC = () => {
           </div>
         ) : (
           <div className="hidden md:flex items-center space-x-4">
-            <button onClick={handleLogout}>Logout</button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+            >
+              Logout
+            </button>
             <RouterLink
               to={dashboard}
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
             >
               {userRole === "admin" ? "Admin Dashboard" : "Dashboard"}
+            </RouterLink>
+            <RouterLink
+              to="/user/cart"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+            >
+              <FiShoppingCart className="text-2xl text-gray-100 dark:text-white" />
             </RouterLink>
             <ThemeToggle />
           </div>

@@ -3,6 +3,12 @@ import { ApiError, ApiSuccess } from "../utils/api-response";
 import Product from "../models/Product";
 import { AuthRequest } from "../middleware/authMiddleware";
 import Cart from "../models/Cart";
+import dotenv from "dotenv";
+import Stripe from "stripe";
+import Order from "../models/Orders";
+
+dotenv.config();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 export const addToCart = async (
   req: AuthRequest,
@@ -186,5 +192,82 @@ export const deleteCart = async (
       .json(new ApiSuccess({ message: "Product removed from cart" }, 200));
   } catch (error) {
     res.status(500).json(new ApiError("Failed to delete cart", 500, error));
+  }
+};
+
+export const checkoutCart = async (
+  req: AuthRequest,
+  res: Response
+): Promise<any> => {
+  try {
+    const userRef = req.user?.userId;
+    const cart = await Cart.findOne({ userRef });
+    if (!cart) {
+      return res.status(200).json(new ApiSuccess("Cart Is Empty", 200));
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: cart.products.map((p) => ({
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: p.productName,
+          },
+          unit_amount: p.sellPrice * 100,
+        },
+        quantity: p.quantity,
+      })),
+
+      success_url: `${process.env.FRONTEND_URL}/user/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL}/user/checkout/cancel`,
+    });
+    // res.redirect(session.url || "");
+    res.json({ url: session.url });
+    console.log(session);
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to checkout", 500, error));
+  }
+};
+
+export const checkoutSuccess = async (
+  req: AuthRequest,
+  res: Response
+): Promise<any> => {
+  try {
+    //take the seesion id from the url
+    const sessionId = req.query.session_id as string;
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    // console.log(session);
+
+    // get the cart and create an order
+    const userRef = req.user?.userId;
+    const cart = await Cart.findOne({ userRef });
+    if (!cart) {
+      return res.status(200).json(new ApiSuccess("Cart Is Empty", 200));
+    }
+
+    const newOrder = new Order({
+      userRef,
+      products: cart.products,
+      totalPaid: session.amount_total ? session.amount_total / 100 : 0,
+      status: session.payment_status === "paid" ? "Paid" : "Unpaid",
+      orderStatus: "Pending",
+      paymentMethod: session.payment_method_types?.[0] || "Card",
+      paymentId: session.payment_intent || "",
+    });
+    const savedOrder = await newOrder.save();
+    if (!savedOrder) {
+      return res.status(500).json(new ApiError("Failed to create order", 500));
+    }
+
+    //clear the cart
+    await Cart.findOneAndDelete({ userRef });
+
+    // res.json({ session });
+    res.status(200).json(new ApiSuccess("Order created successfully", 200));
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(new ApiError("Failed to checkout", 500, error));
   }
 };
