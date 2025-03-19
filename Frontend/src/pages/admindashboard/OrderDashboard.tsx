@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import DataTable from "../../component/adminDashboard/DataTable";
 import Card from "../../component/adminDashboard/Card";
 import CardContent from "../../component/adminDashboard/CardContent";
-
+import orderService from "../../services/orderServices";
 interface Order {
-  id: number;
-  product: string;
+  _id?: string;
   customer: string;
-  status: string;
+  orderStatus: string;
   amount: string;
+  status: string;
+  userRef?: {
+    fullName: string;
+    email: string;
+  };
+  totalPaid: string;
 }
 interface CardData {
   title: string;
@@ -23,66 +28,32 @@ const OrderDashboard: React.FC = () => {
 
   const orderCards: CardData[] = [
     {
-      title: "Total Orders",
-      value: "\u00A30",
-      color: "bg-blue-200",
-      border: "border-blue-500",
-    },
-    {
       title: "Pending Orders",
-      value: "\u00A30",
-      color: "bg-red-200",
+      value: orders
+        .filter((order) => order.orderStatus === "Pending")
+        .length.toString(),
+      color: "bg-red-200 dark:text-black",
       border: "border-red-500",
     },
     {
       title: "Pending Order Amount",
-      value: "\u00A30",
-      color: "bg-green-200",
+      value:
+        "\u00A3" +
+        orders.reduce((acc, order) => acc + parseFloat(order.totalPaid), 0),
+      color: "bg-green-200 dark:text-black",
       border: "border-green-500",
-    },
-    {
-      title: "Net Profit",
-      value: "\u00A30",
-      color: "bg-teal-200",
-      border: "border-teal-500",
     },
   ];
 
+  const fetchOrders = async () => {
+    const response = await orderService.getAllOrders();
+    console.log(response.data.data);
+    setOrders(response.data.data);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setOrders([
-        {
-          id: 1,
-          product: "Laptop",
-          customer: "Alice",
-          status: "Pending",
-          amount: "£1200",
-        },
-        {
-          id: 2,
-          product: "Phone",
-          customer: "Bob",
-          status: "Pending",
-          amount: "£800",
-        },
-        {
-          id: 3,
-          product: "Tablet",
-          customer: "Charlie",
-          status: "Pending",
-          amount: "£500",
-        },
-        {
-          id: 4,
-          product: "Monitor",
-          customer: "David",
-          status: "Pending",
-          amount: "£300",
-        },
-      ]);
-      setLoading(false);
-    }, 100);
+    fetchOrders();
   }, []);
 
   return (
