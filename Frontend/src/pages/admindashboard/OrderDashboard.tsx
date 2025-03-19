@@ -47,8 +47,12 @@ const OrderDashboard: React.FC = () => {
 
   const fetchOrders = async () => {
     const response = await orderService.getAllOrders();
-    console.log(response.data.data);
-    setOrders(response.data.data);
+    const tempData = response.data.data;
+    const datalist = tempData.filter(
+      (order: Order) => order.orderStatus === "Pending"
+    );
+    console.log(datalist);
+    setOrders(datalist);
     setLoading(false);
   };
 

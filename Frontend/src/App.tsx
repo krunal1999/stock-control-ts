@@ -67,6 +67,8 @@ const CheckoutCancel = lazy(
   () => import("./pages/userDashboard/CheckoutCancel")
 );
 
+const DeliverOrder = lazy(() => import("./pages/admindashboard/DeliverOrder"));
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -217,6 +219,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <WarehousePage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="deliverorder"
+          element={
+            <Suspense fallback={<Loader />}>
+              <DeliverOrder />
             </Suspense>
           }
         />

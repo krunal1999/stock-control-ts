@@ -14,6 +14,12 @@ class OrderService {
   getAllOrders() {
     return axiosInstance.get("/admin/orders");
   }
+  getAllDeliveryOrders() {
+    return axiosInstance.get("/admin/orders/delivery");
+  }
+  updateOrderStatus(orderId: string) {
+    return axiosInstance.put(`/admin/orders/${orderId}`);
+  }
 }
 
 const orderService = new OrderService();

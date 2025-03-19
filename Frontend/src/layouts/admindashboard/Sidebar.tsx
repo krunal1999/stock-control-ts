@@ -133,7 +133,7 @@ const Sidebar: React.FC = () => {
       menu: "order",
       children: [
         { label: "Orders Dashboard", path: "/admin/orders" },
-        { label: "Received Orders", path: "/admin/userorders" },
+        { label: "Delivery Orders", path: "/admin/deliverorder" },
       ],
     },
     {
