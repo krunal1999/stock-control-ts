@@ -16,6 +16,7 @@ const LoginPage = () => {
     password?: string;
     agree?: string;
   }>({});
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const LoginPage = () => {
           JSON.stringify(response.data.data.userData)
         );
 
-        if (userRole === "admin") {
+        if (userRole === "admin" || userRole === "employee") {
           navigate("/admin");
         } else {
           navigate("/user");

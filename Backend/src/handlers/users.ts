@@ -98,7 +98,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      maxAge: 3600000 / 2, // 30m in milliseconds
+      maxAge: 4 * 60 * 60 * 1000, // 4h in milliseconds
     });
 
     res

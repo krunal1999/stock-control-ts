@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiMenu, HiX, HiChevronDown } from "react-icons/hi";
+import useAuth from "../../store/useAuth";
 
 interface SidebarItem {
   label: string;
@@ -14,6 +15,8 @@ const Sidebar: React.FC = () => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const { isLoggedIn, userRole } = useAuth();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMenu = (menu: string) => {
@@ -136,12 +139,15 @@ const Sidebar: React.FC = () => {
         { label: "Delivery Orders", path: "/admin/deliverorder" },
       ],
     },
+  ];
+
+  const sidebarItems1: SidebarItem[] = [
     {
-      label: "Billing",
-      menu: "billing",
+      label: "Order Management",
+      menu: "order",
       children: [
-        { label: "Billing Dashboard", path: "/admin/billing" },
-        { label: "Pay Bills", path: "/admin/paybills" },
+        { label: "Orders Dashboard", path: "/admin/orderscompleted" },
+        { label: "Delivery Orders", path: "/admin/deliverorderbymployee" },
       ],
     },
   ];
@@ -160,15 +166,29 @@ const Sidebar: React.FC = () => {
           isOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 z-40`}
       >
-        <h2 className="text-2xl font-bold text-primary dark:text-primary-light mb-6 text-center">
-          Admin Dashboard
-        </h2>
+        {userRole === "admin" ? (
+          <h2 className="text-2xl font-bold text-primary dark:text-primary-light mb-6 text-center">
+            Admin Dashboard
+          </h2>
+        ) : (
+          <h2 className="text-2xl font-bold text-primary dark:text-primary-light mb-6 text-center">
+            Employee Dashboard
+          </h2>
+        )}
 
-        <ul className="space-y-2">
-          {sidebarItems.map((item) => (
-            <MenuItem key={item.label} item={item} />
-          ))}
-        </ul>
+        {userRole === "admin" ? (
+          <ul className="space-y-2">
+            {sidebarItems.map((item) => (
+              <MenuItem key={item.label} item={item} />
+            ))}
+          </ul>
+        ) : (
+          <ul className="space-y-2">
+            {sidebarItems1.map((item) => (
+              <MenuItem key={item.label} item={item} />
+            ))}
+          </ul>
+        )}
       </div>
 
       {isOpen && (

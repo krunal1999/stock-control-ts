@@ -8,6 +8,7 @@ import adminRouter from "./routes/admin";
 import multer from "multer";
 import createAdminUser from "./utils/createAdmin";
 import Stripe from "stripe";
+import createEmployeeUser from "./utils/createEmployee";
 dotenv.config();
 
 const app = express();
@@ -37,6 +38,7 @@ connectDB()
   .then(async () => {
     console.log("MongoDB connected");
     await createAdminUser();
+    await createEmployeeUser();
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);

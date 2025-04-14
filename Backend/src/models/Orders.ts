@@ -11,7 +11,7 @@ export interface IOrder extends Document {
   }[];
   totalPaid: number;
   status: "Paid" | "Unpaid";
-  orderStatus: "Pending" | "Delivered" | "Hold";
+  orderStatus: "Pending" | "Delivered" | "Hold" | "Cancelled" | "Confirmed";
   paymentId: string;
   paymentMethod: string;
 }
@@ -44,7 +44,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     orderStatus: {
       type: String,
-      enum: ["Pending", "Delivered", "Hold"],
+      enum: ["Pending", "Delivered", "Hold", "Cancelled", "Confirmed"],
       default: "Pending",
     },
     paymentId: { type: String, required: true },

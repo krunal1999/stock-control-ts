@@ -9,7 +9,9 @@ const AdminLayout: React.FC = () => {
 
   return (
     <>
-      {isLoggedIn && userRole && userRole === "admin" ? (
+      {isLoggedIn &&
+      userRole &&
+      (userRole === "admin" || userRole === "employee") ? (
         <>
           <Navbar />
           <div className="flex min-h-screen bg-gray-100 dark:bg-gray-800">

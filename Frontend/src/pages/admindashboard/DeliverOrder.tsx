@@ -9,7 +9,9 @@ interface Product {
   availableQuantity: number;
   sellPrice: number;
   locations: { location: string }[];
+  quantity: number;
   stock: number;
+  totalPrice: number;
 }
 
 interface Order {
@@ -18,15 +20,21 @@ interface Order {
     fullName: string;
     email: string;
   };
-  products: { productId: Product; quantity: number }[];
+  products: {
+    productId: Product;
+    quantity: number;
+    productName: string;
+    totalPrice: number;
+  }[];
   totalPaid: number;
   status: string;
   orderStatus: string;
   paymentId: string;
   paymentMethod: string;
   createdAt: string;
-  stock: number;
+  quantity: number;
   productName: string;
+  stock: number;
 }
 
 const DeliverOrder: React.FC = () => {
@@ -43,6 +51,8 @@ const DeliverOrder: React.FC = () => {
     // console.log(tempOrdersWithStock);
     setOrders(tempOrdersWithStock);
   };
+
+  console.log(selectedOrder);
 
   useEffect(() => {
     fetchOrders();
@@ -70,75 +80,6 @@ const DeliverOrder: React.FC = () => {
   };
 
   return (
-    // <div className="max-w-2xl mx-auto p-6">
-    //   <h1 className="text-xl font-bold mb-4">Deliver Order</h1>
-
-    //   {/* Order Selection Dropdown */}
-    //   <select
-    //     className="w-full p-2 border mb-4"
-    //     onChange={(e) => handleSelectOrder(e.target.value)}
-    //   >
-    //     <option value="">Select an Order</option>
-    //     {orders.map((order) => (
-    //       <option key={order._id} value={order._id}>
-    //         {order._id}
-    //       </option>
-    //     ))}
-    //   </select>
-
-    //   {/* Order Details */}
-    //   {selectedOrder && (
-    //     <div className="border p-4 rounded-lg shadow">
-    //       <h2 className="text-lg font-semibold">Order Details</h2>
-    //       <p>
-    //         <strong>Customer:</strong> {selectedOrder.userRef.fullName} (
-    //         {selectedOrder.userRef.email})
-    //       </p>
-    //       <p>
-    //         <strong>Payment Status:</strong> {selectedOrder.status}
-    //       </p>
-    //       <p>
-    //         <strong>Total Paid:</strong> £{selectedOrder.totalPaid}
-    //       </p>
-    //       <p>
-    //         <strong>Order Status:</strong> {selectedOrder.orderStatus}
-    //       </p>
-
-    //       <h3 className="text-lg font-semibold mt-4">Products</h3>
-    //       <table className="w-full border-collapse border">
-    //         <thead>
-    //           <tr className="bg-gray-200">
-    //             <th className="border p-2">Product Name</th>
-    //             <th className="border p-2">Category</th>
-    //             <th className="border p-2">Available</th>
-    //             <th className="border p-2">Selling Price</th>
-    //             <th className="border p-2">Location</th>
-    //           </tr>
-    //         </thead>
-    //         <tbody>
-    //           {selectedOrder.products.map(({ productId }) => (
-    //             <tr key={productId._id}>
-    //               <td className="border p-2">{productId.productName}</td>
-    //               <td className="border p-2">{productId.category}</td>
-    //               <td className="border p-2">{productId.stock}</td>
-    //               <td className="border p-2">£{productId.sellPrice}</td>
-    //               <td className="border p-2">
-    //                 {productId.locations[0].location}
-    //               </td>
-    //             </tr>
-    //           ))}
-    //         </tbody>
-    //       </table>
-
-    //       <button
-    //         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-    //         onClick={handleSendForDelivery}
-    //       >
-    //         Send for Delivery
-    //       </button>
-    //     </div>
-    //   )}
-    // </div>
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
         Deliver Order
@@ -190,34 +131,50 @@ const DeliverOrder: React.FC = () => {
                 <tr>
                   <th className="p-3">Product Name</th>
                   <th className="p-3">Category</th>
-                  <th className="p-3">Available</th>
+                  <th className="p-3">Available Qty</th>
+                  <th className="p-3">Ask Qty</th>
                   <th className="p-3">Selling Price</th>
-                  <th className="p-3">Location</th>
+                  <th className="p-3">Price</th>
                 </tr>
               </thead>
               <tbody>
-                {selectedOrder.products.map(({ productId }) => (
+                {selectedOrder.products.map((product1, id) => (
                   <tr
-                    key={productId._id}
+                    key={id}
                     className="hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <td className="p-3 text-gray-900 dark:text-white">
-                      {productId.productName}
+                      {product1.productName}
                     </td>
                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                      {productId.category}
+                      {product1.productId.category}
                     </td>
                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                      {productId.stock}
+                      {product1.productId.stock}
                     </td>
                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                      £{productId.sellPrice}
+                      {product1.quantity}
                     </td>
                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                      {productId.locations[0].location}
+                      £ {product1.productId.sellPrice}
                     </td>
+                    <td className="p-3 text-gray-700 dark:text-gray-300">
+                      £ {product1.totalPrice}
+                    </td>
+                    {/* <td className="p-3 text-gray-700 dark:text-gray-300">
+                      {product1.productId.locations[0].location}
+                    </td> */}
                   </tr>
                 ))}
+
+                <td className="p-3 text-gray-900 dark:text-white"></td>
+                <td className="p-3 text-gray-700 dark:text-gray-300"></td>
+                <td className="p-3 text-gray-700 dark:text-gray-300"></td>
+                <td className="p-3 text-gray-700 dark:text-gray-300"></td>
+                <td className="p-3 text-gray-700 dark:text-gray-300"></td>
+                <td className="p-3 text-gray-700 dark:text-gray-300">
+                  £ {selectedOrder.totalPaid}
+                </td>
               </tbody>
             </table>
           </div>

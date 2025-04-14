@@ -2,7 +2,7 @@ import { createContext, useState, ReactNode, useEffect } from "react";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  userRole: "admin" | "user" | null;
+  userRole: "admin" | "user" | null | "employee";
   login: (role: "admin" | "user") => void;
   logout: () => void;
 }
@@ -11,7 +11,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
+  const [userRole, setUserRole] = useState<
+    "admin" | "user" | null | "employee"
+  >(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -23,7 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Login function
-  const login = (role: "admin" | "user") => {
+  const login = (role: "admin" | "user" | "employee") => {
     setIsLoggedIn(true);
     setUserRole(role);
     localStorage.setItem("user", JSON.stringify({ role }));
