@@ -68,6 +68,13 @@ const CheckoutCancel = lazy(
 );
 
 const DeliverOrder = lazy(() => import("./pages/admindashboard/DeliverOrder"));
+const DeliverOrderEmp = lazy(
+  () => import("./pages/employeeDashboard/DeliverOrderEmp")
+);
+
+const OrderDashboardEmp = lazy(
+  () => import("./pages/employeeDashboard/OrderDashboardEmp")
+);
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -190,6 +197,15 @@ const router = createBrowserRouter(
             </Suspense>
           }
         />
+
+        <Route
+          path="orderscompleted"
+          element={
+            <Suspense fallback={<Loader />}>
+              <OrderDashboardEmp />
+            </Suspense>
+          }
+        />
         <Route
           path="reports"
           element={
@@ -227,6 +243,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <DeliverOrder />
+            </Suspense>
+          }
+        />
+        <Route
+          path="deliverorderbymployee"
+          element={
+            <Suspense fallback={<Loader />}>
+              <DeliverOrderEmp />
             </Suspense>
           }
         />

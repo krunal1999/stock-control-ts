@@ -59,7 +59,8 @@ const DataTable: React.FC<DataTableProps> = ({ data }) => {
                 <td className="p-3">
                   <span
                     className={`px-3 py-1 rounded-full text-xl font-semibold ${
-                      order.orderStatus === "Pending"
+                      order.orderStatus === "Pending" ||
+                      order.orderStatus === "Confirmed"
                         ? "bg-yellow-500 text-black"
                         : order.orderStatus === "Completed"
                         ? "bg-green-500 text-white"

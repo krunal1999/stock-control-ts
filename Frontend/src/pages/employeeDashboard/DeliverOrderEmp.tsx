@@ -37,7 +37,7 @@ interface Order {
   stock: number;
 }
 
-const DeliverOrder: React.FC = () => {
+const DeliverOrderEmp: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ const DeliverOrder: React.FC = () => {
     const response = await orderService.getAllDeliveryOrders();
     const tempOrders = response.data.data;
     const tempOrdersWithStock = tempOrders.filter((order: Order) => {
-      return order.orderStatus === "Pending";
+      return order.orderStatus === "Confirmed";
     });
     // console.log(tempOrdersWithStock);
     setOrders(tempOrdersWithStock);
@@ -67,10 +67,10 @@ const DeliverOrder: React.FC = () => {
     if (!selectedOrder) return;
 
     try {
-      const response = await orderService.updateOrderStatus(orderId);
+      const response = await orderService.updateOrderStatusByEmp(orderId);
       console.log(response);
       if (response.status === 200) {
-        toast.success("Order Has been Send");
+        toast.success("Order Has been Sent for Delivery");
         setSelectedOrder(null);
         setLoading((prev) => !prev);
       }
@@ -133,8 +133,7 @@ const DeliverOrder: React.FC = () => {
                   <th className="p-3">Category</th>
                   <th className="p-3">Available Qty</th>
                   <th className="p-3">Ask Qty</th>
-                  <th className="p-3">Selling Price</th>
-                  <th className="p-3">Price</th>
+                  <th className="p-3">Location</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,26 +154,21 @@ const DeliverOrder: React.FC = () => {
                     <td className="p-3 text-gray-700 dark:text-gray-300">
                       {product1.quantity}
                     </td>
+
                     <td className="p-3 text-gray-700 dark:text-gray-300">
-                      £ {product1.productId.sellPrice}
-                    </td>
-                    <td className="p-3 text-gray-700 dark:text-gray-300">
-                      £ {product1.totalPrice}
-                    </td>
-                    {/* <td className="p-3 text-gray-700 dark:text-gray-300">
                       {product1.productId.locations[0].location}
-                    </td> */}
+                    </td>
                   </tr>
                 ))}
 
-                <td className="p-3 text-gray-900 dark:text-white"></td>
+                {/* <td className="p-3 text-gray-900 dark:text-white"></td>
                 <td className="p-3 text-gray-700 dark:text-gray-300"></td>
                 <td className="p-3 text-gray-700 dark:text-gray-300"></td>
                 <td className="p-3 text-gray-700 dark:text-gray-300"></td>
                 <td className="p-3 text-gray-700 dark:text-gray-300"></td>
                 <td className="p-3 text-gray-700 dark:text-gray-300">
                   £ {selectedOrder.totalPaid}
-                </td>
+                </td> */}
               </tbody>
             </table>
           </div>
@@ -183,7 +177,7 @@ const DeliverOrder: React.FC = () => {
             className="mt-6 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             onClick={() => handleSendForDelivery(selectedOrder?._id)}
           >
-            Confirm Order
+            Collect and Send for Delivery
           </button>
         </div>
       )}
@@ -191,4 +185,4 @@ const DeliverOrder: React.FC = () => {
   );
 };
 
-export default DeliverOrder;
+export default DeliverOrderEmp;

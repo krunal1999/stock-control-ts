@@ -16,7 +16,7 @@ const Sidebar: React.FC = () => {
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const { isLoggedIn, userRole } = useAuth();
+  const { userRole } = useAuth();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleMenu = (menu: string) => {
@@ -124,7 +124,7 @@ const Sidebar: React.FC = () => {
       children: [
         { label: "Inventory", path: "/admin/inventory" },
         { label: "Add Product", path: "/admin/add-product" },
-        { label: "Update Product", path: "/admin/update-product" },
+        { label: "Product List", path: "/admin/update-product" },
         { label: "Category", path: "/admin/category" },
         // { label: "Warehouse", path: "/admin/warehouse" },
         { label: "Warehouse", path: "/admin/warehouse1" },

@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    if (userRole === "admin") {
+    if (userRole === "admin" || userRole === "employee") {
       setDashboard("/admin");
     } else {
       setDashboard("/user");

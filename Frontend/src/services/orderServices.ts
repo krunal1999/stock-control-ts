@@ -20,6 +20,9 @@ class OrderService {
   updateOrderStatus(orderId: string) {
     return axiosInstance.put(`/admin/orders/${orderId}`);
   }
+  updateOrderStatusByEmp(orderId: string) {
+    return axiosInstance.put(`/admin/orders/emp/${orderId}`);
+  }
 }
 
 const orderService = new OrderService();
