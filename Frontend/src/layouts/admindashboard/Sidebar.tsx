@@ -106,7 +106,7 @@ const Sidebar: React.FC = () => {
       children: [
         { label: "Dashboard", path: "/admin/" },
         { label: "Reports", path: "/admin/reports" },
-        { label: "Data", path: "/admin/data" },
+        { label: "Data Download", path: "/admin/data" },
       ],
     },
     {

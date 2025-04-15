@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Category from "../models/Category";
 import { ApiError, ApiSuccess } from "../utils/api-response";
+import { Parser } from "json2csv";
 
 export const getAllCategories = async (
   req: Request,
@@ -56,5 +57,29 @@ export const deleteCategory = async (
     res.status(200).json(new ApiSuccess("Category deleted successfully", 200));
   } catch (error) {
     res.status(500).json(new ApiError("Failed to delete category", 500, error));
+  }
+};
+
+export const downloadCsvCategory = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const data = await Category.find().lean();
+
+    const schemaFields = Object.keys(Category.schema.paths).filter(
+      (field) => !["_id", "__v"].includes(field)
+    );
+
+    const fields = schemaFields;
+    const parser = new Parser({ fields });
+    const csv = parser.parse(data);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("category.csv");
+    res.send(csv);
+    // res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get category", 500, error));
   }
 };

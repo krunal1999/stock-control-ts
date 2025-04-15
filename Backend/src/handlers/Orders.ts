@@ -5,6 +5,7 @@ import Product from "../models/Product";
 import { generateInvoice } from "../utils/invoiceGenerator";
 import user from "../models/user";
 import { sendEmail } from "../utils/sendEmails";
+import { Parser } from "json2csv";
 
 export const getAllOrders = async (
   req: Request,
@@ -254,5 +255,29 @@ export const updateOrderStatusByEmployee = async (
     res
       .status(500)
       .json(new ApiError("Failed to update order status", 500, error));
+  }
+};
+
+export const downloadCsvOrder = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const data = await Order.find().lean();
+
+    const schemaFields = Object.keys(Order.schema.paths).filter(
+      (field) => !["_id", "__v"].includes(field)
+    );
+
+    const fields = schemaFields;
+    const parser = new Parser({ fields });
+    const csv = parser.parse(data);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("order.csv");
+    res.send(csv);
+    // res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get order", 500, error));
   }
 };

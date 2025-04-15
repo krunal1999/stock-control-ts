@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import Product from "../models/Product";
 import { ApiError, ApiSuccess } from "../utils/api-response";
 import multer from "multer";
 import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 import { allocateStorage } from "./warehouseHandler";
 import WarehouseCell from "../models/WarehouseCellModel";
-import PurchaseModel from "../models/purchase";
 import mongoose from "mongoose";
+import { Parser } from "json2csv";
+
+import PurchaseModel from "../models/purchase";
+import Product from "../models/Product";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -332,5 +334,53 @@ export const getProductById = async (
     res.status(200).json(new ApiSuccess(product, 200));
   } catch (error) {
     res.status(500).json(new ApiError("Failed to get product", 500, error));
+  }
+};
+
+export const downloadCsv = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const products = await Product.find().lean();
+
+    const productSchemaFields = Object.keys(Product.schema.paths).filter(
+      (field) => !["_id", "__v", "locations"].includes(field)
+    );
+
+    const fields = productSchemaFields;
+    const parser = new Parser({ fields });
+    const csv = parser.parse(products);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("products.csv");
+    res.send(csv);
+    // res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get product", 500, error));
+  }
+};
+
+export const downloadCsvPurchase = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const data = await PurchaseModel.find().lean();
+
+    const schemaFields = Object.keys(PurchaseModel.schema.paths).filter(
+      (field) => !["_id", "__v"].includes(field)
+    );
+
+    const fields = schemaFields;
+    const parser = new Parser({ fields });
+    const csv = parser.parse(data);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("purchase.csv");
+    res.send(csv);
+    // res.status(200).json(new ApiSuccess(product, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to get purchase", 500, error));
   }
 };
