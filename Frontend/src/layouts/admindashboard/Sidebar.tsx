@@ -105,7 +105,7 @@ const Sidebar: React.FC = () => {
       menu: "dashboard",
       children: [
         { label: "Dashboard", path: "/admin/" },
-        { label: "Reports", path: "/admin/reports" },
+        // { label: "Reports", path: "/admin/reports" },
         { label: "Data Download", path: "/admin/data" },
       ],
     },
@@ -122,7 +122,7 @@ const Sidebar: React.FC = () => {
       label: "Inventory Management",
       menu: "inventory",
       children: [
-        { label: "Inventory", path: "/admin/inventory" },
+        // { label: "Inventory", path: "/admin/inventory" },
         { label: "Add Product", path: "/admin/add-product" },
         { label: "Product List", path: "/admin/update-product" },
         { label: "Category", path: "/admin/category" },

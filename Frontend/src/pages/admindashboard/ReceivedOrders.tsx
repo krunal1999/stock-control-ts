@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiCheckCircle } from "react-icons/hi";
 import purchaseservice from "../../services/PurchaseService";
+import toast from "react-hot-toast";
 
 interface PurchaseOrder {
   _id: string;
@@ -43,12 +44,12 @@ const ReceivedOrders: React.FC = () => {
       setIsLoading(true);
       const response = await purchaseservice.updatePurchaseOrder(order._id);
       if (response.status === 200) {
-        alert("Order received successfully");
+        toast.success("Order received successfully");
         setIsLoading(false);
       }
       console.log(response);
     } catch (error) {
-      alert("Failed to receive order");
+      toast.error("Failed to receive order");
       setIsLoading(false);
       console.log(error);
     }
@@ -69,7 +70,7 @@ const ReceivedOrders: React.FC = () => {
           setIsLoading(false);
           alert("Product added to inventory successfully");
         }
-      } catch (error) {
+      } catch (error: any) {
         setIsLoading(false);
         alert("Failed to add product to inventory");
         // console.log(error?.response?.data?.error);

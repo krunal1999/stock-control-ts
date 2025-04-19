@@ -8,6 +8,8 @@ import {
   createProduct,
   getAllProducts,
   addProductToInventory,
+  updateProduct,
+  deleteProduct,
 } from "../handlers/ProductHandler";
 import multer from "multer";
 
@@ -52,5 +54,7 @@ router.post(
 );
 
 router.put("/product/add-to-inventory", addProductToInventory);
+router.put("/product/update/:productId", updateProduct);
+router.delete("/product/delete/:productId", deleteProduct);
 
 export default router;

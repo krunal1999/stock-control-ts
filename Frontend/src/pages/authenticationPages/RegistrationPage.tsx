@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { HiUser, HiMail, HiLockClosed, HiPhone } from "react-icons/hi";
+import {
+  HiUser,
+  HiMail,
+  HiLockClosed,
+  HiPhone,
+  HiLocationMarker,
+} from "react-icons/hi";
 import { RegisterFormData } from "types";
 import authenticationServices from "../../services/AuthenticationServices";
 import toast from "react-hot-toast";
@@ -11,6 +17,7 @@ const Register: React.FC = () => {
     password: "",
     mobile: "",
     gender: "",
+    address: "",
   });
 
   const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
@@ -64,11 +71,6 @@ const Register: React.FC = () => {
         formData
       );
 
-      // console.log(response);
-      if (response.status !== 200) {
-        console.log(response.data);
-      }
-
       if (response.status === 201) {
         setMessage("Registration successful!");
         setFormData({
@@ -77,11 +79,19 @@ const Register: React.FC = () => {
           password: "",
           mobile: "",
           gender: "",
+          address: "",
         });
         toast.success("Registration successful!");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error(error.status);
+
+      if (error.status == 409) {
+        console.log(error.status);
+        toast.error("Registration failed. Email already exists.");
+        return;
+      }
+
       setMessage("Something went wrong");
       toast.error("Registration failed. Please try again.");
     } finally {
@@ -101,9 +111,9 @@ const Register: React.FC = () => {
           Register
         </h2>
 
-        {message && (
+        {/* {message && (
           <p className="text-center text-green-600 text-xl">{message}</p>
-        )}
+        )} */}
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-6">
           {/* Full Name Field */}
@@ -155,6 +165,22 @@ const Register: React.FC = () => {
           </label>
           {errors.password && (
             <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+          )}
+
+          <label className="input input-bordered flex items-center gap-3 bg-background-light dark:bg-background-dark">
+            <HiLocationMarker className="text-primary dark:text-primary-light" />
+            <input
+              type="text"
+              name="address"
+              className="grow bg-transparent text-text-light dark:text-text-dark outline-none"
+              placeholder="Full Address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            />
+          </label>
+          {errors.address && (
+            <p className="text-red-500 text-xs mt-1">{errors.address}</p>
           )}
 
           {/* Mobile Field */}

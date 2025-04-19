@@ -3,7 +3,7 @@ import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { Link as ScrollLink, animateScroll as scroll } from "react-scroll";
 // Import react-scroll
 import { HiMenu, HiX } from "react-icons/hi";
-import { FiShoppingCart } from "react-icons/fi";
+import { FiList, FiShoppingCart } from "react-icons/fi";
 import ThemeToggle from "./ThemeToggle";
 import useAuth from "../store/useAuth";
 
@@ -120,6 +120,12 @@ const Navbar: React.FC = () => {
               className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
             >
               <FiShoppingCart className="text-2xl text-gray-100 dark:text-white" />
+            </RouterLink>
+            <RouterLink
+              to="/user/orderhistroy"
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+            >
+              <FiList className="text-2xl text-gray-100 dark:text-white" />
             </RouterLink>
             <ThemeToggle />
           </div>

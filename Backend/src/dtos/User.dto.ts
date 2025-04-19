@@ -4,6 +4,7 @@ export interface RegisterUserDTO {
   password: string;
   mobile: string;
   gender: string;
+  address?: string;
 }
 
 export interface LoginUserDTO {

@@ -11,7 +11,7 @@ export const registerUser = async (
   res: Response
 ): Promise<any> => {
   try {
-    const { fullName, email, password, mobile, gender } =
+    const { fullName, email, password, mobile, gender, address } =
       req.body as RegisterUserDTO;
 
     const schema = Joi.object({
@@ -20,6 +20,7 @@ export const registerUser = async (
       password: Joi.string().min(6).required(),
       mobile: Joi.string().required(),
       gender: Joi.string().valid("male", "female", "other").required(),
+      address: Joi.string().optional(),
     });
 
     const { error, value } = schema.validate(req.body);
@@ -43,6 +44,7 @@ export const registerUser = async (
       gender,
       password: hashedPassword,
       role: "user",
+      address,
     });
 
     const newUserCreated = await user.save();

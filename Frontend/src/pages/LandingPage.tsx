@@ -1,8 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section
       id="home"
@@ -13,10 +15,10 @@ const Hero: React.FC = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        className="text-center max-w-2xl bg-black/50  p-10 rounded-lg"
+        className="text-center max-w-3xl bg-black/50  p-10 rounded-lg"
       >
         <h1 className="text-5xl font-bold text-white dark:text-light ">
-          Welcome to MyBrand
+          Welcome to Silicon Supply
         </h1>
         <p className="py-6 text-lg text-gray-200">
           A modern platform designed to enhance your experience. Join us and
@@ -26,6 +28,7 @@ const Hero: React.FC = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="px-6 py-3 bg-button-primary text-button-text-light dark:bg-button-primary-hover dark:text-button-text-dark rounded-md hover:bg-button-primary-hover transition-all duration-300"
+          onClick={() => navigate("/explore")}
         >
           Get Started
         </motion.button>
@@ -142,7 +145,7 @@ const Contact: React.FC = () => {
               <HiPhone className="mr-2 text-primary" /> +1 (123) 456-7890
             </p>
             <p className="text-lg font-semibold mt-4 flex items-center">
-              <HiMail className="mr-2 text-primary" /> info@mybrand.com
+              <HiMail className="mr-2 text-primary" /> info@siliconsupply.com
             </p>
           </div>
 

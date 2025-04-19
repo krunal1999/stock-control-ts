@@ -76,6 +76,8 @@ const OrderDashboardEmp = lazy(
   () => import("./pages/employeeDashboard/OrderDashboardEmp")
 );
 
+const OrderHistroy = lazy(() => import("./pages/userDashboard/orderHistroy"));
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -94,6 +96,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <RegistrationPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/explore"
+          element={
+            <Suspense fallback={<Loader />}>
+              <UserDashboard />
             </Suspense>
           }
         />
@@ -286,6 +296,14 @@ const router = createBrowserRouter(
           element={
             <Suspense fallback={<Loader />}>
               <Cart />
+            </Suspense>
+          }
+        />
+        <Route
+          path="orderhistroy"
+          element={
+            <Suspense fallback={<Loader />}>
+              <OrderHistroy />
             </Suspense>
           }
         />

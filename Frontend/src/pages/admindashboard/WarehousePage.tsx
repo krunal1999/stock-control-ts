@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import warehouseService from "../../services/WarehouseService";
+import toast from "react-hot-toast";
 interface Warehouse {
   row: number;
   col: number;
@@ -43,14 +44,33 @@ const WarehousePage: React.FC = () => {
     setLoading(true);
     console.log(formData);
 
+    if (
+      !formData.row ||
+      !formData.col ||
+      !formData.totalVolume ||
+      !formData.warehouseName.trim()
+    ) {
+      toast.error("⚠️ All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.row <= 0 || formData.col <= 0 || formData.totalVolume <= 0) {
+      toast.error(
+        "⚠️ Row, Column, and Total Volume must be greater than zero."
+      );
+      setLoading(false);
+      return;
+    }
+
     try {
       await warehouseService.createWarehouse(formData);
-      alert("Warehouse Created Successfully!");
+      toast.success("Warehouse Created Successfully!");
       setFormData({ row: 0, col: 0, totalVolume: 0, warehouseName: "" });
       fetchWarehouses();
     } catch (error) {
       console.error("Error creating warehouse:", error);
-      alert("Error creating warehouse.");
+      toast.error("⚠️ Failed to create warehouse.");
     } finally {
       setLoading(false);
     }

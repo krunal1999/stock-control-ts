@@ -4,6 +4,7 @@ export interface RegisterFormData {
   password: string;
   mobile: string;
   gender: string;
+  address: string;
 }
 
 export interface LoginFormData {

@@ -27,9 +27,12 @@ class InventoryService {
   getProductById(id: string) {
     return axiosInstance.get(`/admin/inventory/product/${id}`);
   }
-  //   updateProduct(id: string, data: any) {
-  //     return axiosInstance.put(`/admin/product/${id}`, data);
-  //   }
+  updateProduct(id: string, data: any) {
+    return axiosInstance.put(`/admin/inventory/product/update/${id}`, data);
+  }
+  deleteProduct(id: string) {
+    return axiosInstance.delete(`/admin/inventory/product/delete/${id}`);
+  }
 }
 
 const inventoryService = new InventoryService();

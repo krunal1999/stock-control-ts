@@ -4,6 +4,7 @@ import vendorservice from "../../services/VendorServices";
 import purchaseservice from "../../services/PurchaseService";
 import inventoryService from "../../services/InventoryService";
 import categoryService from "../../services/CategoryServices";
+import toast from "react-hot-toast";
 // Interfaces
 interface Vendor {
   _id: string;
@@ -171,11 +172,11 @@ const PurchaseManagement: React.FC = () => {
       console.log(response);
       if (response.status === 200) {
         dispatch({ type: "RESET" });
-        alert("Purchase Order Created Successfully");
+        toast.success("Purchase Order Created Successfully");
       }
     } catch (error) {
       console.error("Error creating purchase order:", error);
-      alert("Error creating purchase order");
+      toast.error("Error creating purchase order. Please try again.");
     }
   };
 

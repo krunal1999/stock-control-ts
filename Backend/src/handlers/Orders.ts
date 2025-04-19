@@ -19,6 +19,22 @@ export const getAllOrders = async (
   }
 };
 
+export const getAllOrdersByUserid = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const orders = await Order.find({ userRef: id });
+    if (!orders) {
+      return res.status(404).json(new ApiError("No orders found", 404));
+    }
+    res.status(200).json(new ApiSuccess(orders, 200));
+  } catch (error) {
+    res.status(500).json(new ApiError("Failed to fetch orders", 500, error));
+  }
+};
+
 export const getAllDeliveryOrders = async (
   req: Request,
   res: Response

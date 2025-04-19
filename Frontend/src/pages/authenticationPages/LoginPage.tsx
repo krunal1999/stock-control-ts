@@ -106,7 +106,7 @@ const LoginPage = () => {
       <div className="w-96 shadow-xl p-6 rounded-lg bg-white dark:bg-gray-800">
         <h2 className="text-center text-lg font-semibold">Login</h2>
 
-        {message && <p className="text-center text-green-600">{message}</p>}
+        {/* {message && <p className="text-center text-green-600">{message}</p>} */}
 
         <form onSubmit={handleSubmit} className="space-y-8 mt-4">
           <label className="input input-bordered flex items-center gap-2">

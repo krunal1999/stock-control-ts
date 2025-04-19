@@ -58,6 +58,10 @@ const VendorSchema: Schema = new Schema(
       required: [true, "Country of Origin is required"],
       trim: true,
     },
+    isDeleted: {
+      type: Boolean,
+      default: false, // Mark as not deleted by default
+    },
   },
   { timestamps: true }
 );

@@ -14,6 +14,9 @@ class OrderService {
   getAllOrders() {
     return axiosInstance.get("/admin/orders");
   }
+  getAllOrdersByUserId(id: String) {
+    return axiosInstance.get(`/admin/orders/user/${id}`);
+  }
   getAllDeliveryOrders() {
     return axiosInstance.get("/admin/orders/delivery");
   }

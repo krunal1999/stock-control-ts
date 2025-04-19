@@ -18,7 +18,7 @@ export const getAllProducts = async (
   res: Response
 ): Promise<any> => {
   try {
-    const products = await Product.find();
+    const products = await Product.find({ isDeleted: { $ne: true } });
     res.status(200).json(new ApiSuccess(products, 200));
   } catch (error) {
     res.status(500).json(new ApiError("Failed to fetch products", 500, error));
@@ -382,5 +382,109 @@ export const downloadCsvPurchase = async (
     // res.status(200).json(new ApiSuccess(product, 200));
   } catch (error) {
     res.status(500).json(new ApiError("Failed to get purchase", 500, error));
+  }
+};
+
+export const updateProduct = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const { productId } = req.params;
+    const updateData = req.body;
+
+    // Fields that can be updated
+    const allowedFields = [
+      "productName",
+      "costPrice",
+      "sellPrice",
+      "discountPrice",
+      "countryOfOrigin",
+      "category",
+      "minQuantityAlert",
+      "lowStockAlert",
+      "productDescription",
+      "isActice",
+    ];
+
+    // Filter the update data to only include allowed fields
+    const filteredData = Object.keys(updateData)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((obj: any, key) => {
+        obj[key] = updateData[key];
+        return obj;
+      }, {});
+
+    // Validation
+    if (Object.keys(filteredData).length === 0) {
+      return res
+        .status(400)
+        .json(new ApiError("No valid fields to update", 400));
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { $set: filteredData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json(new ApiError("Product not found", 404));
+    }
+
+    return res.status(200).json(
+      new ApiSuccess(
+        {
+          message: "Product updated successfully",
+        },
+        200
+      )
+    );
+  } catch (error) {
+    console.error("Failed to update product:", error);
+    return res
+      .status(500)
+      .json(new ApiError("Failed to update product", 500, error));
+  }
+};
+
+// delete product
+export const deleteProduct = async (
+  req: Request,
+  res: Response
+): Promise<any> => {
+  try {
+    const { productId } = req.params;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json(new ApiError("Product not found", 404));
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { $set: { isDeleted: true } },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res
+        .status(500)
+        .json(new ApiError("Failed to delete product", 500));
+    }
+
+    return res.status(200).json(
+      new ApiSuccess(
+        {
+          message: "Product deleted successfully",
+        },
+        200
+      )
+    );
+  } catch (error) {
+    console.error("Failed to delete product:", error);
+    return res
+      .status(500)
+      .json(new ApiError("Failed to delete product", 500, error));
   }
 };

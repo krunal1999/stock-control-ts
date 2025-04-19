@@ -3,10 +3,15 @@ import Navbar from "../../layouts/Navbar";
 import ProtectedRoute from "../../layouts/ProtectedRoute";
 import useAuth from "../../store/useAuth";
 import Footer from "../../layouts/Footer";
+import toast from "react-hot-toast";
 
 const UserLayout: React.FC = () => {
   // const userRole = localStorage.getItem("userRole") || "";
   const { isLoggedIn, userRole } = useAuth();
+
+  if (!isLoggedIn) {
+    toast.error("Please log in to access this page.");
+  }
 
   return (
     <>

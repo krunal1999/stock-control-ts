@@ -92,23 +92,31 @@ const Cart = () => {
 
       {cart && cart.products?.length > 0 ? (
         <div>
+          <div className="grid grid-cols-5 gap-4 py-2 border-b dark:border-gray-700 font-medium text-gray-700 dark:text-gray-300">
+            <span>Product</span>
+            <span className="text-center">Price</span>
+            <span className="text-center">Quantity</span>
+            <span className="text-center">Total</span>
+            <span className="text-center">Action</span>
+          </div>
+
           {cart.products.map((item) => (
             <div
               key={item.productId}
-              className="flex flex-wrap justify-between items-center border-b py-3 dark:border-gray-700"
+              className="grid grid-cols-5 gap-4 py-3 items-center border-b dark:border-gray-700"
             >
               {/* Product Name */}
-              <span className="text-lg text-gray-800 dark:text-gray-200">
+              <span className="text-lg text-gray-800 dark:text-gray-200 truncate">
                 {item.productName}
               </span>
 
               {/* Price */}
-              <span className="text-lg font-semibold text-gray-900 dark:text-gray-300">
+              <span className="text-lg font-semibold text-gray-900 dark:text-gray-300 text-center">
                 ${item.sellPrice}
               </span>
 
               {/* Quantity Controls */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 <button
                   onClick={() =>
                     handleQuantityChange(item.productId, item.quantity - 1)
@@ -118,7 +126,7 @@ const Cart = () => {
                   -
                 </button>
 
-                <span className="text-lg text-gray-800 dark:text-gray-200">
+                <span className="text-lg text-gray-800 dark:text-gray-200 w-8 text-center">
                   {item.quantity}
                 </span>
 
@@ -133,17 +141,19 @@ const Cart = () => {
               </div>
 
               {/* Total Price */}
-              <span className="font-semibold text-gray-900 dark:text-gray-200">
+              <span className="font-semibold text-gray-900 dark:text-gray-200 text-center">
                 ${item.totalPrice.toFixed(2)}
               </span>
 
               {/* Remove Button */}
-              <button
-                onClick={() => removeItem(item.productId)}
-                className=" hover:text-red-600 dark:hover:text-red-300  px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-              >
-                Remove
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => removeItem(item.productId)}
+                  className="hover:text-red-600 dark:hover:text-red-300 px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
           ))}
 

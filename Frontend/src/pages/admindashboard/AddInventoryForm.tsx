@@ -4,6 +4,7 @@ import { HiOutlinePhotograph } from "react-icons/hi";
 import warehouseService from "../../services/WarehouseService";
 import inventoryService from "../../services/InventoryService";
 import purchaseservice from "../../services/PurchaseService";
+import toast from "react-hot-toast";
 
 interface ProductFormData {
   productName: string;
@@ -183,7 +184,7 @@ const AddInventoryForm: React.FC = () => {
 
           console.log(updatePurchaseOrder);
           if (updatePurchaseOrder.status === 200) {
-            alert("Purchase order updated");
+            toast.success("Purchase order updated successfully");
           }
         }
 
@@ -210,13 +211,13 @@ const AddInventoryForm: React.FC = () => {
           vendorId: "",
         });
         setLoading(false);
-        alert("Product created successfully");
+        toast.success("Product created successfully");
         window.location.reload();
       }
     } catch (error) {
       setLoading(false);
       console.log(error);
-      alert("Failed to create product");
+      toast.error("Failed to create product");
     }
   };
 

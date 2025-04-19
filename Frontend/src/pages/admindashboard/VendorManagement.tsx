@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HiTrash, HiPencilAlt, HiPlusCircle, HiX } from "react-icons/hi";
 import vendorservice from "../../services/VendorServices";
+import toast from "react-hot-toast";
 
 interface Vendor {
   _id?: string;
@@ -75,6 +76,7 @@ const VendorManagement: React.FC = () => {
 
   const handleSaveVendor = async () => {
     if (!currentVendor) return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (
       !currentVendor.fullName.trim() ||
       !currentVendor.email.trim() ||
@@ -88,18 +90,30 @@ const VendorManagement: React.FC = () => {
       setError("⚠️ All fields are required.");
       return;
     }
-    console.log(currentVendor);
+    // console.log(currentVendor);
+    if (!emailRegex.test(currentVendor.email)) {
+      setError("⚠️ Please enter a valid email address.");
+      return;
+    }
 
     try {
       setError("");
       setLoading(true);
       const response = await vendorservice.createVendor(currentVendor);
-      console.log(response);
+      // console.log(response);
+      if (response.status === 201) {
+        toast.success("Vendor created successfully!");
+      }
+
       handleCloseModal();
       setLoading(false);
       setError("");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      if (error.status === 409) {
+        setError("⚠️ Vendor already exists.");
+        toast.error("Vendor already exists.");
+      }
     }
   };
 

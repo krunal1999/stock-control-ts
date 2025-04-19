@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { HiTrash, HiPlusCircle } from "react-icons/hi";
 import categoryService from "../../services/CategoryServices";
+import toast from "react-hot-toast";
 
 interface Category {
   _id: string;
@@ -25,6 +26,7 @@ const CategoryPage: React.FC = () => {
   const handleAddCategory = async () => {
     if (!categoryName.trim()) {
       setError("⚠️ Category name cannot be empty.");
+      toast.error("⚠️ Category name cannot be empty.");
       return;
     }
     setError("");
@@ -37,13 +39,13 @@ const CategoryPage: React.FC = () => {
         setIsLoading(false);
         setCategoryName("");
         setError("");
-        alert("Category created successfully");
+        toast.success("Category created successfully.");
       }
     } catch (error) {
       console.log(error);
       setIsLoading(false);
       setError("⚠️ Failed to create category.");
-      alert("Failed to create category");
+      toast.error("⚠️ Failed to create category.");
     }
   };
 
@@ -54,12 +56,12 @@ const CategoryPage: React.FC = () => {
       const response = await categoryService.deleteCategory(id);
       if (response.status === 200) {
         setIsLoading(false);
-        alert("Category deleted successfully");
+        toast.success("Category deleted successfully.");
       }
     } catch (error) {
       console.log(error);
       setIsLoading(false);
-      alert("Failed to delete category");
+      toast.error("⚠️ Failed to delete category.");
     }
   };
 

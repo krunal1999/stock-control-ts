@@ -8,6 +8,7 @@ interface User extends Document {
   gender: string;
   role: string;
   accessToken: string;
+  address?: string;
 }
 
 const userSchema: Schema = new Schema(
@@ -19,6 +20,7 @@ const userSchema: Schema = new Schema(
     gender: { type: String, required: true },
     role: { type: String, required: true, default: "user" },
     accessToken: { type: String },
+    address: { type: String },
   },
   { timestamps: true }
 );

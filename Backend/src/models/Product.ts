@@ -21,6 +21,8 @@ interface ProductFormData extends Document {
   quantity: string;
   productDescription: string;
   warehouseName: string;
+  isDeleted: boolean;
+  isActice: boolean;
 }
 
 const ProductSchema: Schema = new Schema({
@@ -45,6 +47,8 @@ const ProductSchema: Schema = new Schema({
   productDescription: { type: String },
   vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "Vendor" },
   warehouseName: { type: String },
+  isDeleted: { type: Boolean, default: false },
+  isActice: { type: String, default: "Active" },
 });
 
 const Product = mongoose.model<ProductFormData>("Product", ProductSchema);
