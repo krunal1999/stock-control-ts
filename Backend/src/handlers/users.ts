@@ -64,8 +64,13 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password } = req.body as LoginUserDTO;
 
+    if (!email || !password) {
+      return res
+        .status(401)
+        .json(new ApiError("Email and password are required", 401));
+    }
+
     const user = await User.findOne({ email });
-    // console.log(user);
 
     if (!user) {
       return res
@@ -76,6 +81,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
+      console.log("Password doesn't match, sending 401 response");
       return res
         .status(401)
         .json(new ApiError("Invalid email or password", 401));
@@ -84,9 +90,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     const accessToken = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET || "secret",
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
 
     const userData = {
@@ -98,17 +102,17 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production", // Only in production
       sameSite: "none",
-      maxAge: 4 * 60 * 60 * 1000, // 4h in milliseconds
+      maxAge: 12 * 60 * 60 * 1000, // 12h in milliseconds
     });
 
-    res
+    return res
       .status(200)
       .json(new ApiSuccess({ message: "Login successful", userData }, 200));
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json(new ApiError("Login failed", 500, error));
+    return res.status(500).json(new ApiError("Login failed", 500, error));
   }
 };
 
