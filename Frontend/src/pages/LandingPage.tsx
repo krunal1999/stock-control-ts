@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { HiMail, HiPhone, HiLocationMarker } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import userServices from "../services/UserServices";
 
 const Hero: React.FC = () => {
   const navigate = useNavigate();
@@ -121,7 +122,139 @@ const Features: React.FC = () => {
   );
 };
 
+// const Contact: React.FC = () => {
+//   return (
+//     <section
+//       id="contact"
+//       className="py-16 bg-background-light dark:bg-background-dark dark:text-white"
+//     >
+//       <div className="container mx-auto px-6 text-center">
+//         <h2 className="text-4xl font-bold text-primary dark:text-white">
+//           Contact Us
+//         </h2>
+//         <p className="mt-4 text-lg text-text-light dark:text-text-dark">
+//           Have any questions? Reach out to us!
+//         </p>
+
+//         <div className="mt-10 flex flex-col md:flex-row justify-center gap-10 dark:text-white">
+//           <div className="text-left max-w-md">
+//             <p className="text-lg font-semibold flex items-center">
+//               <HiLocationMarker className="mr-2 text-primary" /> 123 Tech
+//               Street, Innovation City
+//             </p>
+//             <p className="text-lg font-semibold mt-4 flex items-center">
+//               <HiPhone className="mr-2 text-primary" /> +1 (123) 456-7890
+//             </p>
+//             <p className="text-lg font-semibold mt-4 flex items-center">
+//               <HiMail className="mr-2 text-primary" /> info@siliconsupply.com
+//             </p>
+//           </div>
+
+//           <div className="max-w-md w-full bg-surface-light dark:bg-surface-dark p-8 rounded-lg shadow-lg">
+//             <h3 className="text-2xl font-semibold text-primary dark:text-primary-light text-center">
+//               Get in Touch
+//             </h3>
+//             <p className="text-text-light dark:text-text-dark text-center mb-6">
+//               We'd love to hear from you. Fill out the form below.
+//             </p>
+
+//             <form className="space-y-4">
+//               <div>
+//                 <label className="block text-text-light dark:text-text-dark text-sm font-medium text-left">
+//                   Your Name
+//                 </label>
+//                 <input
+//                   type="text"
+//                   placeholder="John Doe"
+//                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all"
+//                 />
+//               </div>
+
+//               <div>
+//                 <label className="block text-text-light dark:text-text-dark text-sm font-medium text-left">
+//                   Your Email
+//                 </label>
+//                 <input
+//                   type="email"
+//                   placeholder="example@mail.com"
+//                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all"
+//                 />
+//               </div>
+
+//               <div>
+//                 <label className="block text-text-light dark:text-text-dark text-sm font-medium text-left">
+//                   Your Message
+//                 </label>
+//                 <textarea
+//                   placeholder="Write your message..."
+//                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all h-32 resize-none"
+//                 ></textarea>
+//               </div>
+
+//               <motion.button
+//                 whileHover={{ scale: 1.02 }}
+//                 whileTap={{ scale: 0.98 }}
+//                 className="w-full px-6 py-3 bg-button-primary text-button-text-light dark:bg-primary dark:text-button-text-dark rounded-md hover:bg-button-primary-hover
+//                 dark:hover:bg-white dark:hover:text-black
+//                 transition-all duration-300"
+//               >
+//                 Send Message
+//               </motion.button>
+//             </form>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
 const Contact: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    success?: boolean;
+    message?: string;
+  } | null>(null);
+  const form = useRef<HTMLFormElement>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // console.log(formData);
+    // Simulate form submission
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    try {
+      const response = await userServices.sendEmailData(formData);
+      // console.log(response);
+      if (response.status === 200) {
+        setSubmitStatus({
+          success: true,
+          message: "we have received your message!",
+        });
+        setFormData({ name: "", email: "", message: "" });
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      setSubmitStatus({
+        success: false,
+        message: "Something went wrong. Please try again.",
+      });
+      console.log(error);
+    }
+  };
+
   return (
     <section
       id="contact"
@@ -138,8 +271,8 @@ const Contact: React.FC = () => {
         <div className="mt-10 flex flex-col md:flex-row justify-center gap-10 dark:text-white">
           <div className="text-left max-w-md">
             <p className="text-lg font-semibold flex items-center">
-              <HiLocationMarker className="mr-2 text-primary" /> 123 Tech
-              Street, Innovation City
+              <HiLocationMarker className="mr-2 text-primary" />
+              123 Tech Street, Innovation City
             </p>
             <p className="text-lg font-semibold mt-4 flex items-center">
               <HiPhone className="mr-2 text-primary" /> +1 (123) 456-7890
@@ -157,15 +290,31 @@ const Contact: React.FC = () => {
               We'd love to hear from you. Fill out the form below.
             </p>
 
-            <form className="space-y-4">
+            {submitStatus && (
+              <div
+                className={`p-3 mb-4 rounded-md ${
+                  submitStatus.success
+                    ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-100"
+                    : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-100"
+                }`}
+              >
+                {submitStatus.message}
+              </div>
+            )}
+
+            <form ref={form} onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-text-light dark:text-text-dark text-sm font-medium text-left">
                   Your Name
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="John Doe"
                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all"
+                  required
                 />
               </div>
 
@@ -175,8 +324,12 @@ const Contact: React.FC = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="example@mail.com"
                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all"
+                  required
                 />
               </div>
 
@@ -185,19 +338,27 @@ const Contact: React.FC = () => {
                   Your Message
                 </label>
                 <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   placeholder="Write your message..."
                   className="w-full p-3 mt-1 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark border border-border-light dark:border-border-dark rounded-md shadow-sm focus:ring-primary focus:border-primary outline-none transition-all h-32 resize-none"
+                  required
                 ></textarea>
               </div>
 
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-6 py-3 bg-button-primary text-button-text-light dark:bg-primary dark:text-button-text-dark rounded-md hover:bg-button-primary-hover 
+                type="submit"
+                disabled={isSubmitting}
+                whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                className={`w-full px-6 py-3 bg-button-primary text-button-text-light dark:bg-primary dark:text-button-text-dark rounded-md hover:bg-button-primary-hover 
                 dark:hover:bg-white dark:hover:text-black
-                transition-all duration-300"
+                transition-all duration-300 ${
+                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                }`}
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </motion.button>
             </form>
           </div>

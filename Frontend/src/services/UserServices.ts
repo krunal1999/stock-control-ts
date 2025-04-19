@@ -19,6 +19,9 @@ class UserServices {
       `/users/userdashboard/getproductdetails/${productId}`
     );
   }
+  sendEmailData(data: any) {
+    return axiosInstance.post("/users/sendemail", data);
+  }
 }
 
 const userServices = new UserServices();
