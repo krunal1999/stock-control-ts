@@ -1,6 +1,7 @@
 import Product from "../models/Product";
 import { ApiError, ApiSuccess } from "../utils/api-response";
 import { NextFunction, Request, Response } from "express";
+import Purchase from "../models/purchase";
 
 export const getgrapghData1 = async (
   req: Request,
@@ -11,6 +12,16 @@ export const getgrapghData1 = async (
 
     const labels = products.map((p) => p.productName);
     const quantities = products.map((p) => parseInt(p.quantity));
+    const stock = products.map((p) => parseInt(p.stock));
+    const totalStock = stock.reduce((sum, current) => sum + current, 0);
+
+    const purchases = await Purchase.find({ status: "Pending" });
+
+    const purchaseQuantities = purchases.map((p) => p.quantity);
+    const purchaseTotal = purchaseQuantities.reduce(
+      (sum, current) => sum + current,
+      0
+    );
 
     // inventory monitoring. <Bar data={stockChartData} options={{ responsive: true }} />
     let firstGraphData = {
@@ -63,7 +74,7 @@ export const getgrapghData1 = async (
 
     const lowStockProducts = await Product.find().then((products) =>
       products.filter(
-        (p) => parseInt(p.quantity) < parseInt(p.lowStockAlert || "0")
+        (p) => parseInt(p.stock) < parseInt(p.lowStockAlert || "0")
       )
     );
     const fourthGraphData = {
@@ -82,6 +93,8 @@ export const getgrapghData1 = async (
       secondGraphData,
       thirdGraphData,
       fourthGraphData,
+      totalStock,
+      purchaseTotal,
     };
 
     res.status(200).json(new ApiSuccess(data, 200));

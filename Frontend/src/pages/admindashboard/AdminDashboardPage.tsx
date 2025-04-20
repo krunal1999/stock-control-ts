@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import useAuth from "../../store/useAuth";
 import { useNavigate } from "react-router-dom";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import graphsService from "../../services/GraphsService";
 
 ChartJS.register(
@@ -132,7 +132,7 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {revenueCards.map((card, index) => (
           <Card
             key={index}
@@ -144,6 +144,21 @@ const AdminDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
         ))}
+      </div> */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="card p-6 bg-surface-light dark:bg-surface-dark shadow-lg rounded-xl border border-border-light dark:border-border-dark">
+          <h2 className="text-4xl font-semibold ">📦 Inventory Summary</h2>
+          <br />
+          <div className="mt-4 text-4xl space-y-8">
+            <p>
+              ✅ Quantity in Hand: <b>{grapghData1.totalStock}</b>
+            </p>
+            <p>
+              🔄 Quantity to be Received: <b>{grapghData1.purchaseTotal}</b>
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -178,40 +193,6 @@ const AdminDashboardPage: React.FC = () => {
           )}
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="card p-6 bg-surface-light dark:bg-surface-dark shadow-lg rounded-xl border border-border-light dark:border-border-dark">
-          <h2 className="text-lg font-semibold">📊 Overall Revenue</h2>
-          <Bar data={chartData} />
-        </div>
-
-        <div className="card p-6 bg-surface-light dark:bg-surface-dark shadow-lg rounded-xl border border-border-light dark:border-border-dark">
-          <h2 className="text-4xl font-semibold ">📦 Inventory Summary</h2>
-          <br />
-          <div className="mt-4 text-4xl space-y-8">
-            <p>
-              ✅ Quantity in Hand: <b>0</b>
-            </p>
-            <p>
-              🔄 Quantity to be Received: <b>0</b>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="card p-6 bg-surface-light dark:bg-surface-dark shadow-lg rounded-xl border border-border-light dark:border-border-dark">
-          <h2 className="text-lg font-semibold">📊 Sales Trend</h2>
-          <Line data={lineChartData} />
-        </div>
-
-        <div className=" card p-6 bg-surface-light dark:bg-surface-dark shadow-lg rounded-xl border border-border-light dark:border-border-dark">
-          {/* <h2 className="text-lg font-semibold">📊 Product Distribution</h2> */}
-          <Pie data={pieChartData} options={pieChartOptions} />
-        </div>
-      </div>
-
-      {/*  */}
     </div>
   );
 };
