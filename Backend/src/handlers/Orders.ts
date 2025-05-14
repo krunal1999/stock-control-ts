@@ -109,6 +109,7 @@ export const updateOrderStatus = async (
       status: savedOrder.status || "",
       orderStatus: savedOrder.orderStatus || "",
       products: savedOrder.products,
+      address: user1?.address || "",
     });
 
     const emailSubject = `Order Confirmed  - ${savedOrder._id}`;
@@ -223,6 +224,7 @@ export const updateOrderStatusByEmployee = async (
       status: savedOrder.status || "",
       orderStatus: savedOrder.orderStatus || "",
       products: savedOrder.products,
+      address: user1?.address || "",
     });
 
     const emailSubject = `Order Delivered  - ${savedOrder._id}`;

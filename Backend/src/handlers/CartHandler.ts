@@ -281,6 +281,7 @@ export const checkoutSuccess = async (
       status: savedOrder.status || "",
       orderStatus: savedOrder.orderStatus || "",
       products: savedOrder.products,
+      address: user1?.address || "",
     });
 
     const emailSubject = `Order Confirmation - ${savedOrder._id}`;

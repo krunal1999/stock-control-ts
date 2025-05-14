@@ -21,7 +21,7 @@ export const authenticateJWT = (
   const token =
     req.header("Authorization")?.split(" ")[1] || req.cookies?.accessToken;
 
-  //   console.log(token);
+  // console.log(token);
 
   if (!token) {
     res.status(401).json({ message: "Unauthorized - No token provided" });

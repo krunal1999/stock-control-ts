@@ -21,26 +21,30 @@ const SingleProduct = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const response = await userServices.getProductDetails(
-        productId as string
-      );
-      console.log(response.data.data);
-      const tempProducts = response.data.data ? response.data.data : null;
+    try {
+      const fetchProduct = async () => {
+        const response = await userServices.getProductDetails(
+          productId as string
+        );
+        console.log(response.data.data);
+        const tempProducts = response.data.data ? response.data.data : null;
 
-      const productData = {
-        _id: tempProducts?._id,
-        productName: tempProducts?.productName,
-        category: tempProducts?.category,
-        sellPrice: tempProducts?.sellPrice,
-        images: tempProducts?.images,
-        productDescription: tempProducts?.productDescription,
+        const productData = {
+          _id: tempProducts?._id,
+          productName: tempProducts?.productName,
+          category: tempProducts?.category,
+          sellPrice: tempProducts?.sellPrice,
+          images: tempProducts?.images,
+          productDescription: tempProducts?.productDescription,
+        };
+
+        setProduct(productData);
+        setMainImage(productData?.images[0]);
       };
-
-      setProduct(productData);
-      setMainImage(productData?.images[0]);
-    };
-    fetchProduct();
+      fetchProduct();
+    } catch (error) {
+      console.log(error);
+    }
   }, [productId]);
 
   const handleAddToCart = async (productId: string, quantity: number) => {

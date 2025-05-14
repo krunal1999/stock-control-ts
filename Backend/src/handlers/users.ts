@@ -93,6 +93,7 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
       { expiresIn: "1d" }
     );
 
+    console.log(accessToken);
     const userData = {
       _id: user._id,
       fullName: user.fullName,
@@ -101,9 +102,9 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     };
 
     res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only in production
-      sameSite: "none",
+      httpOnly: false,
+      secure: false,
+      sameSite: "lax",
       maxAge: 12 * 60 * 60 * 1000, // 12h in milliseconds
     });
 

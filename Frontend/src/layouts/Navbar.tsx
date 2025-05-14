@@ -115,18 +115,24 @@ const Navbar: React.FC = () => {
             >
               {userRole === "admin" ? "Admin Dashboard" : "Dashboard"}
             </RouterLink>
-            <RouterLink
-              to="/user/cart"
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
-            >
-              <FiShoppingCart className="text-2xl text-gray-100 dark:text-white" />
-            </RouterLink>
-            <RouterLink
-              to="/user/orderhistroy"
-              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
-            >
-              <FiList className="text-2xl text-gray-100 dark:text-white" />
-            </RouterLink>
+
+            {userRole === "user" ? (
+              <>
+                <RouterLink
+                  to="/user/cart"
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+                >
+                  <FiShoppingCart className="text-2xl text-gray-100 dark:text-white" />
+                </RouterLink>
+                <RouterLink
+                  to="/user/orderhistroy"
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all duration-300"
+                >
+                  <FiList className="text-2xl text-gray-100 dark:text-white" />
+                </RouterLink>
+              </>
+            ) : null}
+
             <ThemeToggle />
           </div>
         )}
