@@ -412,7 +412,7 @@ const LandingPage = () => {
       <Hero />
       <About />
       <Features />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <Contact />
     </main>
   );
